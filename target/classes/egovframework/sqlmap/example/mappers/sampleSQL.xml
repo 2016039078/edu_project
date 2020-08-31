@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sample">
+
+	<update id="insert" parameterType="sampleVO" >
+
+			INSERT INTO SAMPLE
+			( 
+				ID
+			  , NAME
+			  , DESCRIPTION
+			  , USE_YN
+			  , REG_USER 
+			 )
+			VALUES 	
+			( 
+				#{id}
+			  , #{name}
+			  , #{description}
+			  , #{use_yn}
+			  , #{reg_user} 
+			)
+
+	</update>
+
+	<update id="update"  parameterType="sampleVO" >
+
+			UPDATE SAMPLE
+			SET 
+				ID=#{id}
+				, NAME=#{name}
+				, DESCRIPTION=#{description}
+				, USE_YN=#{use_yn}
+			WHERE ID=#{id}
+
+	</update>
+
+	<update id="delete"  parameterType="sampleVO">
+
+			DELETE FROM SAMPLE
+			WHERE ID=#{id}
+
+	</update>
+
+	<select id="select" resultType="sampleVO">
+
+			SELECT
+				ID, NAME, DESCRIPTION, USE_YN, REG_USER
+			FROM SAMPLE
+			WHERE ID=#{id}
+
+	</select>
+
+	<select id="selectList" parameterType="sampleVO" resultType="sampleVO">
+
+			SELECT
+				ID, NAME, DESCRIPTION, USE_YN, REG_USER
+			FROM SAMPLE
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+		        <choose>
+		            <when test="searchCondition == 0">
+						AND	ID LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 1">
+						AND	NAME LIKE '%' || #{searchKeyword} || '%'
+					</when>
+				</choose>
+			</if>
+			ORDER BY ID DESC
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectListTotCnt" parameterType="sampleVO" resultType="int">
+
+			SELECT COUNT(*) totcnt
+			FROM SAMPLE
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+		        <choose>
+		            <when test="searchCondition == 0">
+						AND ID LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 1">
+						AND	NAME LIKE '%' || #{searchKeyword} || '%'
+					</when>
+				</choose>
+			</if>
+	</select>
+
+</mapper>

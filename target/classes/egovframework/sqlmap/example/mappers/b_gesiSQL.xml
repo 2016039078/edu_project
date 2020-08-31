@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="b_gesi">
+
+	<update id="insert" parameterType="b_gesiVO" >
+
+			INSERT INTO B_GESI
+			( 
+
+				BOARD_TYPE,
+				DISPLAY_YN,
+				TITLE,
+				CONTENT,
+				
+				ATTACH_PATH,
+				ATTACH_NAME,
+				HIT,
+				IN_DATE,
+				IN_USER_ID,
+				
+				UP_DATE,
+				UP_USER_ID
+
+			 )
+			VALUES 	
+			( 
+
+				#{board_type},
+				#{display_yn},
+				#{title},
+				#{content},
+				
+				#{attach_path},
+				#{attach_name},
+				1,
+				DATE_FORMAT(NOW(), '%Y%m%d%h%m%s'),
+				#{in_user_id},
+				
+				DATE_FORMAT(NOW(), '%Y%m%d%h%m%s'),
+				#{in_user_id}
+			)
+			
+		
+
+	</update>
+
+	<update id="update"  parameterType="b_gesiVO" >
+
+			UPDATE B_GESI
+			SET 
+				BOARD_TYPE=#{board_type},
+				DISPLAY_YN=#{display_yn},
+				TITLE=#{title},
+				CONTENT=#{content},
+				
+				ATTACH_PATH=#{attach_path},
+				ATTACH_NAME=#{attach_name},
+				
+				UP_DATE=DATE_FORMAT(NOW(), '%Y%m%d%h%m%s'),
+				UP_USER_ID=#{up_user_id}
+
+			WHERE NO=#{no}
+
+	</update>
+	
+	<update id="updateHit"  parameterType="b_gesiVO" >
+			UPDATE B_GESI
+			SET 
+				HIT = HIT+1
+			WHERE NO=#{no}
+
+	</update>	
+	
+	<update id="deleteFile"  parameterType="b_gesiVO" >
+			UPDATE B_GESI
+			SET 
+				ATTACH_PATH='',
+				ATTACH_NAME=''
+			WHERE NO=#{no}
+
+	</update>		
+
+	<update id="delete"  parameterType="b_gesiVO">
+
+			DELETE FROM B_GESI
+			WHERE NO=#{no}
+
+	</update>
+
+	<select id="select" resultType="b_gesiVO">
+
+			SELECT
+				NO,
+				BOARD_TYPE,
+				DISPLAY_YN,
+				TITLE,
+				CONTENT,
+				
+				ATTACH_PATH,
+				ATTACH_NAME,
+				HIT,
+				IN_DATE,
+				IN_USER_ID,
+				
+				UP_DATE,
+				UP_USER_ID,
+				IF(length(ATTACH_NAME) > 0,'y','') ATTACH_NAME_YN
+			FROM B_GESI
+			WHERE NO=#{no}
+
+
+	</select>
+
+	<select id="selectList" parameterType="b_gesiVO" resultType="b_gesiVO">
+
+			SELECT
+				NO,
+				BOARD_TYPE,
+				DISPLAY_YN,
+				TITLE,
+				CONTENT,
+				
+				ATTACH_PATH,
+				ATTACH_NAME,
+				HIT,
+				IN_DATE,
+				IN_USER_ID,
+				
+				UP_DATE,
+				UP_USER_ID,
+				IF(length(ATTACH_NAME) > 0,'y','') ATTACH_NAME_YN
+			FROM B_GESI
+			WHERE 1=1
+			ORDER BY NO DESC
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+	
+
+	<select id="selectListTotCnt" parameterType="b_gesiVO" resultType="int">
+
+			SELECT COUNT(*) totcnt
+			FROM B_GESI
+			WHERE 1=1
+
+	</select>
+
+</mapper>

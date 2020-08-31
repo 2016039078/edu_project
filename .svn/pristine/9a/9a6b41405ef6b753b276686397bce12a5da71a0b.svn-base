@@ -1,0 +1,101 @@
+
+package kr.co.ncspartner.vo;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import egovframework.example.cmmn.vo.DefaultVO;
+
+public class Jeogi_userVO extends DefaultVO {
+
+	private String user_id;
+	private String email;
+	private String password;
+	private String user_name;
+	private String user_birth;
+	private String user_ph;
+	private String tag;
+	private String host_intro;
+	private String r_id;
+	
+	
+	public String getR_id() {
+		return r_id;
+	}
+
+	public void setR_id(String r_id) {
+		this.r_id = r_id;
+	}
+
+	public String getUser_id() {
+		return user_id;
+	}
+
+	public void setUser_id(String user_id) {
+		this.user_id = user_id;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getUser_name() {
+		return user_name;
+	}
+
+	public void setUser_name(String user_name) {
+		this.user_name = user_name;
+	}
+
+	public String getUser_birth() {
+		return user_birth;
+	}
+
+	public void setUser_birth(String user_birth) {
+		this.user_birth = user_birth;
+	}
+
+	public String getUser_ph() {
+		return user_ph;
+	}
+
+	public void setUser_ph(String user_ph) {
+		this.user_ph = user_ph;
+	}
+
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
+	public String getHost_intro() {
+		return host_intro;
+	}
+
+	public void setHost_intro(String host_intro) {
+		this.host_intro = host_intro;
+	}
+	
+	
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
+
+	
+}

@@ -1,0 +1,140 @@
+package ncspartner.util;
+
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.codehaus.jackson.map.ObjectMapper;
+
+public class AjaxUtil {
+	public static void responseXml(HttpServletResponse response,String resultStr) throws Exception{
+		response.setContentType("application/xml");
+		PrintWriter out = response.getWriter();
+		out.print(resultStr);
+		out.flush();
+		out.close();
+	}	
+	
+	public static void responseJson(HttpServletResponse response, List list) throws Exception {
+		String result = new ObjectMapper().writeValueAsString(list);
+		response.setContentType("text/javascript;charset=utf-8");
+		PrintWriter out = response.getWriter();
+		out.print(result);
+		out.flush();
+		out.close();
+	}
+
+	public static void responseJson(HttpServletResponse response, String resultStr) throws Exception {
+		String result = new ObjectMapper().writeValueAsString(resultStr);
+		response.setContentType("text/javascript;charset=utf-8");
+		PrintWriter out = response.getWriter();
+		out.print(result);
+		out.flush();
+		out.close();
+	}
+	
+	public static void responseStr(HttpServletResponse response, String resultStr) throws Exception {
+		String result = resultStr;
+		response.setContentType("text/javascript;charset=utf-8");
+		PrintWriter out = response.getWriter();
+		out.print(result);
+		out.flush();
+		out.close();
+	}	
+
+	public static void responseJson(HttpServletResponse response, Map map) throws Exception {
+		String result = new ObjectMapper().writeValueAsString(map);
+		response.setContentType("text/javascript;charset=utf-8");
+		PrintWriter out = response.getWriter();
+		out.print(result);
+		out.flush();
+		out.close();
+	}
+}
+
+
+
+	function fn_ajax() {
+		var param = "";
+		param += "dummy=" + Math.random();
+		param += "&domain_url=hello";
+		$.ajax({
+			url : "<c:url value='/k_food.ajax'/>",
+			data : param,
+			dataType : "json",
+			type : "post",
+			async: false,
+			statusCode : {
+				404 : function() {
+					alert("네트워크가 불안정합니다. 다시 시도부탁드립니다.");
+				}
+			},
+			success : function(data) {
+				fn_ajax_callback(data);
+			}
+		});
+	}	
+	function fn_ajax_callback(data){
+		if(data == null){
+			return;
+		}
+		alert(data);
+		$.each(data, function(index, entry) {
+			alert(entry.food_id);
+		});
+	}	
+
+
+
+	@RequestMapping(value = "/delete_file.ajax")
+	public void ajax_delete_file(@ModelAttribute("f_truck_menuVO") F_truck_menuVO paramVO, HttpServletRequest request, ModelMap model, HttpServletResponse response) throws Exception {
+		String auth_url = "/delete_file.ajax";
+		LOGGER.debug("------------------------------------------------------------:" + auth_url);
+		LOGGER.debug("------------------------------------------------------------:paramVO:" + paramVO);
+		
+		int count = f_truck_menuService.deleteNo(paramVO);
+		LOGGER.debug("-----------------------:count:"+count);		
+		String message = "ok";
+		if(count!=1){
+			message = "ng";
+		}
+		
+		AjaxUtil.responseJson(response, message);
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

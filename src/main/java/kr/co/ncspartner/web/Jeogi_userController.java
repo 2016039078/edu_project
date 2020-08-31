@@ -1,0 +1,121 @@
+
+package kr.co.ncspartner.web;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springmodules.validation.commons.DefaultBeanValidator;
+
+import egovframework.rte.fdl.property.EgovPropertyService;
+import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
+
+import kr.co.ncspartner.service.Jeogi_userService;
+
+import kr.co.ncspartner.vo.Jeogi_userVO;
+
+
+
+
+@Controller
+public class Jeogi_userController {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(Jeogi_userController.class);
+
+	@Resource(name = "Jeogi_userService")
+	private Jeogi_userService jeogi_userService;
+
+	@Resource(name = "propertiesService")
+	protected EgovPropertyService propertiesService;
+
+	@Resource(name = "beanValidator")
+	protected DefaultBeanValidator beanValidator;
+	
+	
+	@RequestMapping(value = "/jeogi_user_select.do")
+	public String do_jeogi_user_select(@ModelAttribute("jeogi_userVO") Jeogi_userVO vo, ModelMap model) throws Exception {
+		
+		LOGGER.debug("--------------------------------//jeogi_user_select.do");
+		LOGGER.debug(vo.toString());
+
+		vo.setPageUnit(propertiesService.getInt("pageUnit"));
+		vo.setPageSize(propertiesService.getInt("pageSize"));
+
+		PaginationInfo paginationInfo = new PaginationInfo();
+		paginationInfo.setCurrentPageNo(vo.getPageIndex());
+		paginationInfo.setRecordCountPerPage(vo.getPageUnit());
+		paginationInfo.setPageSize(vo.getPageSize());
+
+		vo.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		vo.setLastIndex(paginationInfo.getLastRecordIndex());
+		vo.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+
+		List<?> list = jeogi_userService.selectList(vo);
+		model.addAttribute("list", list);
+
+		int totCnt = jeogi_userService.selectListTotCnt(vo);
+		paginationInfo.setTotalRecordCount(totCnt);
+		model.addAttribute("paginationInfo", paginationInfo);
+
+		return "jeogi/jeogi_user_select";
+	}	
+	
+//	-----------회원가입 내용-------------
+	@RequestMapping(value = "/jeogi_user_insert.do")
+	public String do_jeogi_user_insert(@ModelAttribute("jeogi_userVO") Jeogi_userVO vo, ModelMap model) throws Exception {
+		LOGGER.debug("--------------------------------//jeogi_user_insert.do");
+		LOGGER.debug(vo.toString());		
+		return "c/jeogi_user_insert";
+	}		
+	
+	@RequestMapping(value = "/jeogi_user_insert_act.do")
+	public String do_jeogi_user_insert_act(@ModelAttribute("jeogi_userVO") Jeogi_userVO vo, ModelMap model) throws Exception {
+		LOGGER.debug("--------------------------------//jeogi_user_insert_act.do");
+		LOGGER.debug(vo.toString());		
+		int cnt = jeogi_userService.insert(vo);
+		model.addAttribute("cnt", cnt);
+		return "jeogi_act/jeogi_user_insert_act";
+	}	
+//	-----------회원가입 내용-------------
+	
+		
+	@RequestMapping(value = "/jeogi_user_update.do")
+	public String do_jeogi_user_update(@ModelAttribute("jeogi_userVO") Jeogi_userVO vo, ModelMap model,HttpServletRequest request,
+			HttpServletResponse response,HttpSession session) throws Exception{
+		LOGGER.debug("--------------------------------//jeogi_user_update.do");
+		LOGGER.debug(vo.toString());	
+		Jeogi_userVO rvo =new Jeogi_userVO();
+		
+		Jeogi_userVO uvo = (Jeogi_userVO) session.getAttribute("userSession");
+		vo.setUser_id(uvo.getUser_id());
+		
+		
+		rvo = jeogi_userService.select(vo);
+		model.addAttribute("rvo",rvo);
+		return "jeogi/jeogi_user_update";
+	}
+	
+	@RequestMapping(value = "/jeogi_user_update_act.do")
+	public String do_jeogi_user_update_act(@ModelAttribute("jeogi_userVO") Jeogi_userVO vo, ModelMap model,HttpSession session) throws Exception {
+		LOGGER.debug("--------------------------------//jeogi_user_update_act.do");
+		LOGGER.debug(vo.toString());		
+		
+		Jeogi_userVO uvo = (Jeogi_userVO) session.getAttribute("userSession");
+		vo.setUser_id(uvo.getUser_id());
+			
+		int cnt = jeogi_userService.update(vo);
+		model.addAttribute("cnt", cnt);
+		
+		return "jeogi/jeogi_user_update_act";
+	}	
+	
+}

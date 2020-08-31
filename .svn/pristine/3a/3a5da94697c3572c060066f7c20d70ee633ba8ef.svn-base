@@ -1,0 +1,678 @@
+
+package kr.co.ncspartner.web;
+
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import org.springmodules.validation.commons.DefaultBeanValidator;
+
+import egovframework.rte.fdl.property.EgovPropertyService;
+import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
+import kr.co.ncspartner.service.ConService;
+import kr.co.ncspartner.service.JeogiService;
+import kr.co.ncspartner.service.Jeogi_userService;
+import kr.co.ncspartner.service.PrecautionsService;
+import kr.co.ncspartner.service.ReviewService;
+import kr.co.ncspartner.service.RoomsReservationService;
+import kr.co.ncspartner.vo.ConVO;
+import kr.co.ncspartner.vo.JeogiVO;
+import kr.co.ncspartner.vo.Jeogi_userVO;
+import kr.co.ncspartner.vo.PrecautionsVO;
+import kr.co.ncspartner.vo.ReviewVO;
+import kr.co.ncspartner.vo.RoomsReservationVO;
+import kr.co.ncspartner.vo.SampleVO;
+
+@Controller
+public class ConController {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConController.class);
+
+	@Resource(name = "txManager")
+	protected DataSourceTransactionManager txManager;
+
+	@Resource(name = "conService")
+	private ConService conService;
+
+	@Resource(name = "jeogiService")
+	private JeogiService jeogiService;
+
+	@Resource(name = "Jeogi_userService")
+	private Jeogi_userService jeogi_userService;
+
+	@Resource(name = "roomsReservationService")
+	private RoomsReservationService roomsReservationService;
+
+	@Resource(name = "precautionsService")
+	private PrecautionsService precautionsService;
+
+	@Resource(name = "reviewService")
+	private ReviewService reviewService;
+
+	@Resource(name = "propertiesService")
+	protected EgovPropertyService propertiesService;
+
+	@Resource(name = "beanValidator")
+	protected DefaultBeanValidator beanValidator;
+
+	@RequestMapping(value = "/rooms_detail_con.do")
+	public String do_sample_select(@ModelAttribute("conVO") ConVO vo, @ModelAttribute("jeogiVO") JeogiVO vo2,
+			@ModelAttribute("precautionsVO") PrecautionsVO vo3, @ModelAttribute("reviewVO") ReviewVO vo4,
+			@ModelAttribute("jeogi_userVO") Jeogi_userVO vo5,
+			@ModelAttribute("roomsReservationVO") RoomsReservationVO vo6, ModelMap model, HttpServletRequest request) throws Exception {
+
+		LOGGER.debug("--------------------------------//rooms_detail_con.do");
+
+		vo.setPageUnit(propertiesService.getInt("pageUnit"));
+		vo.setPageSize(propertiesService.getInt("pageSize"));
+
+		PaginationInfo paginationInfo = new PaginationInfo();
+		paginationInfo.setCurrentPageNo(vo.getPageIndex());
+		paginationInfo.setRecordCountPerPage(vo.getPageUnit());
+		paginationInfo.setPageSize(vo.getPageSize());
+
+		vo.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		vo.setLastIndex(paginationInfo.getLastRecordIndex());
+		vo.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+
+		ConVO c_namervo = conService.select(vo);
+		model.addAttribute("c_namervo", c_namervo);
+
+		JeogiVO rvo = jeogiService.select(vo2);
+		JeogiVO rvo2 = jeogiService.select2(vo2);
+
+		model.addAttribute("rvo", rvo);
+		model.addAttribute("rvo2", rvo2);
+
+		PrecautionsVO prevo = precautionsService.select(vo3);
+		model.addAttribute("prevo", prevo);
+
+		ReviewVO scoreavg = reviewService.scoreAvg(vo4);
+		model.addAttribute("scoreavg", scoreavg);
+
+		List<?> relist = reviewService.selectList(vo4);
+		model.addAttribute("relist", relist);
+
+		Jeogi_userVO uservo = jeogi_userService.selectHost(vo5);
+		model.addAttribute("uservo", uservo);
+
+		List<?> reservationlist = roomsReservationService.selectList(vo6);
+		model.addAttribute("reservationlist", reservationlist);
+		
+		JeogiVO intercnt = jeogiService.select(vo2);
+		model.addAttribute("intercnt", intercnt);
+		LOGGER.debug("--------------------------------//PrecautionsVO.do");
+		LOGGER.debug(vo3.toString());
+		LOGGER.debug(vo4.toString());
+		LOGGER.debug(vo5.toString());
+		LOGGER.debug(vo6.toString());
+		
+		
+
+		
+	
+		int totCnt = conService.selectListTotCnt(vo);
+
+		paginationInfo.setTotalRecordCount(totCnt);
+		model.addAttribute("paginationInfo", paginationInfo);
+
+		return "sample/rooms_detail";
+	}
+
+	@RequestMapping(value = "/rooms_detail_reservation.do")
+	public String do_rooms_detail_reservation(@ModelAttribute("conVO") ConVO vo, @ModelAttribute("jeogiVO") JeogiVO vo2,
+			@ModelAttribute("precautionsVO") PrecautionsVO vo3, @ModelAttribute("reviewVO") ReviewVO vo4,
+			@ModelAttribute("jeogi_userVO") Jeogi_userVO vo5,
+			@ModelAttribute("roomsReservationVO") RoomsReservationVO vo6, ModelMap model, HttpServletRequest request)
+			throws Exception {
+
+		LOGGER.debug("--------------------------------//rooms_detail_reservation.do");
+
+		vo.setPageUnit(propertiesService.getInt("pageUnit"));
+		vo.setPageSize(propertiesService.getInt("pageSize"));
+
+		PaginationInfo paginationInfo = new PaginationInfo();
+		paginationInfo.setCurrentPageNo(vo.getPageIndex());
+		paginationInfo.setRecordCountPerPage(vo.getPageUnit());
+		paginationInfo.setPageSize(vo.getPageSize());
+
+		vo.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		vo.setLastIndex(paginationInfo.getLastRecordIndex());
+		vo.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+
+		ConVO c_namervo = conService.select(vo);
+		model.addAttribute("c_namervo", c_namervo);
+
+		JeogiVO rvo = jeogiService.select(vo2);
+		JeogiVO rvo2 = jeogiService.select2(vo2);
+
+		model.addAttribute("rvo", rvo);
+		model.addAttribute("rvo2", rvo2);
+
+		PrecautionsVO prevo = precautionsService.select(vo3);
+		model.addAttribute("prevo", prevo);
+
+		ReviewVO scoreavg = reviewService.scoreAvg(vo4);
+		model.addAttribute("scoreavg", scoreavg);
+
+		List<?> relist = reviewService.selectList(vo4);
+		model.addAttribute("relist", relist);
+
+		Jeogi_userVO uservo = jeogi_userService.selectHost(vo5);
+		model.addAttribute("uservo", uservo);
+
+		List<?> reservationlist = roomsReservationService.selectList(vo6);
+		model.addAttribute("reservationlist", reservationlist);
+
+		LOGGER.debug("--------------------------------//PrecautionsVO.do");
+		LOGGER.debug(vo3.toString());
+		LOGGER.debug(vo4.toString());
+		LOGGER.debug(vo5.toString());
+		LOGGER.debug(vo6.toString());
+
+		int totCnt = conService.selectListTotCnt(vo);
+
+		paginationInfo.setTotalRecordCount(totCnt);
+
+		model.addAttribute("paginationInfo", paginationInfo);
+		model.addAttribute("r_id", request.getParameter("r_id"));
+		model.addAttribute("r_date", request.getParameter("r_date"));
+		return "sample/rooms_reservation";
+	}
+
+	@RequestMapping(value = "/rooms_detail_con1.do")
+	public String do_sample_detail(@ModelAttribute("conVO") ConVO vo, ModelMap model) throws Exception {
+		LOGGER.debug("--------------------------------//rooms_detail_con1.do");
+		LOGGER.debug(vo.toString());
+		ConVO rvo = conService.select(vo);
+		model.addAttribute("con_rvo", rvo);
+		return "sample/sample_detail";
+	}
+
+	@RequestMapping(value = "/rooms_hosting_insert.do")
+	public String do_rooms_hosting_insert(@ModelAttribute("conVO") ConVO vo, @ModelAttribute("jeogiVO") JeogiVO vo2,
+			@ModelAttribute("precautionsVO") PrecautionsVO vo3, ModelMap model, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		LOGGER.debug("--------------------------------//rooms_hosting_insert.do");
+		LOGGER.debug(vo.toString());
+		//
+		// JeogiVO jrvo = jeogiService.selectmaxr_id(vo2);
+		// model.addAttribute("rrvo", jrvo);
+		//
+		// LOGGER.debug(jrvo.toString());
+
+		List<Map<String, Object>> oneWeekDayList = conService.selectOneWeekDay();
+
+		model.addAttribute("oneWeekDayList", oneWeekDayList);
+
+		return "sample/rooms_hosting_insert";
+	}
+
+	@RequestMapping(value = "/rooms_hosting_insert_act.do")
+	public String do_rooms_hosting_insert_act(@ModelAttribute("conVO") ConVO vo, @ModelAttribute("jeogiVO") JeogiVO vo2,
+			@ModelAttribute("precautionsVO") PrecautionsVO vo3, @ModelAttribute("jeogi_userVO") Jeogi_userVO vo4,
+			@ModelAttribute("roomsReservationVO") RoomsReservationVO vo5, ModelMap model, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus txStatus = txManager.getTransaction(def);
+
+		LOGGER.debug("--------------------------------//rooms_hosting_insert_act.do");
+		LOGGER.debug(vo.toString());
+		try {
+
+			CommonsMultipartFile multipartfile = (CommonsMultipartFile) vo2.getMyfile1();
+			CommonsMultipartFile multipartfile2 = (CommonsMultipartFile) vo2.getMyfile2();
+			CommonsMultipartFile multipartfile3 = (CommonsMultipartFile) vo2.getMyfile3();
+			CommonsMultipartFile multipartfile4 = (CommonsMultipartFile) vo2.getMyfile4();
+			CommonsMultipartFile multipartfile5 = (CommonsMultipartFile) vo2.getMyfile5();
+
+			String file_origin = multipartfile.getOriginalFilename();
+			String file_origin2 = multipartfile2.getOriginalFilename();
+			String file_origin3 = multipartfile3.getOriginalFilename();
+			String file_origin4 = multipartfile4.getOriginalFilename();
+			String file_origin5 = multipartfile5.getOriginalFilename();
+
+			String file_path = "C:/upload/saeil/" + multipartfile.getOriginalFilename() + new Date().getTime();
+			String file_path2 = "C:/upload/saeil/" + multipartfile2.getOriginalFilename() + new Date().getTime();
+			String file_path3 = "C:/upload/saeil/" + multipartfile3.getOriginalFilename() + new Date().getTime();
+			String file_path4 = "C:/upload/saeil/" + multipartfile4.getOriginalFilename() + new Date().getTime();
+			String file_path5 = "C:/upload/saeil/" + multipartfile5.getOriginalFilename() + new Date().getTime();
+
+			File file = new File(file_path);
+			File file2 = new File(file_path2);
+			File file3 = new File(file_path3);
+			File file4 = new File(file_path4);
+			File file5 = new File(file_path5);
+
+			multipartfile.transferTo(file);
+			multipartfile2.transferTo(file2);
+			multipartfile3.transferTo(file3);
+			multipartfile4.transferTo(file4);
+			multipartfile5.transferTo(file5);
+
+			if (file_origin != null) {
+				if (file_origin.length() > 0) {
+					vo2.setR_attach01(file_origin);
+					vo2.setR_path01(file_path);
+				}
+			}
+
+			if (file_origin2 != null) {
+				if (file_origin2.length() > 0) {
+					vo2.setR_attach02(file_origin2);
+					vo2.setR_path02(file_path2);
+				}
+			}
+
+			if (file_origin3 != null) {
+				if (file_origin3.length() > 0) {
+					vo2.setR_attach03(file_origin3);
+					vo2.setR_path03(file_path3);
+				}
+			}
+
+			if (file_origin4 != null) {
+				if (file_origin4.length() > 0) {
+					vo2.setR_attach04(file_origin4);
+					vo2.setR_path04(file_path4);
+				}
+			}
+
+			if (file_origin5 != null) {
+				if (file_origin5.length() > 0) {
+					vo2.setR_attach05(file_origin5);
+					vo2.setR_path05(file_path5);
+				}
+			}
+
+			String dates = vo5.getR_date();
+			String[] datearry = dates.split(",");
+
+			String r_id = roomsReservationService.getR_id(null);
+
+			String str_cur_1000 = "1" + r_id.substring(1, r_id.length());
+			int int_r_id = Integer.parseInt(str_cur_1000) + 1;
+			String str_r_id = int_r_id + "";
+			str_r_id = "r" + str_r_id.substring(1, str_r_id.length());
+
+			for (int i = 0; i < datearry.length; i++) {
+				RoomsReservationVO tempVo = new RoomsReservationVO();
+				tempVo.setR_id(str_r_id);
+				tempVo.setR_date(datearry[i]);
+				int rcnt2 = roomsReservationService.insert(tempVo);
+
+			}
+
+			int ccnt = conService.insert(vo);
+			int jcnt = jeogiService.insert(vo2);
+			int pcnt = precautionsService.insert(vo3);
+			int ucnt = jeogi_userService.updateHostIntro(vo4);
+
+			model.addAttribute("ccnt", ccnt);
+			model.addAttribute("jcnt", jcnt);
+			model.addAttribute("pcnt", pcnt);
+			model.addAttribute("ucnt", ucnt);
+
+			txManager.commit(txStatus); // 정상일경우 COMMIT;
+			model.put("result", 0);
+
+			return "sample/rooms_hosting_insert_act";
+
+		} catch (Exception e) {
+			response.setCharacterEncoding("EUC-KR");
+			PrintWriter out = response.getWriter();
+			e.printStackTrace();
+			out.println("<script type='text/javascript'>");
+			out.println("alert('시스템에 문제가 생겼습니다. 다시 시도하거나 관리자에게 문의바랍니다.')");
+			out.println("history.back()");
+			out.println("</script>");
+			out.flush();
+			txManager.rollback(txStatus); // 에러날경우 CATCH로 빠져서 ROLLBACK;
+			model.put("result", -1);
+
+			return "sample/rooms_hosting_insert";
+		}
+
+	}
+
+	@RequestMapping(value = "/rooms_update_reservation_act.do")
+	public String do_sample_update_act(@ModelAttribute("conVO") ConVO vo,
+			@ModelAttribute("roomsReservationVO") RoomsReservationVO vo2, ModelMap model) throws Exception {
+		LOGGER.debug("--------------------------------//rooms_update_reservation_act.do");
+		LOGGER.debug(vo.toString());
+
+		int roomrecnt = roomsReservationService.update(vo2);
+		model.addAttribute("roomrecnt", roomrecnt);
+
+		return "sample/rooms_reservation_act";
+	}
+
+	@RequestMapping(value = "/rooms_detail_con_delete_act.do")
+	public String do_sample_delete_act(@ModelAttribute("conVO") ConVO vo, ModelMap model) throws Exception {
+		LOGGER.debug("--------------------------------//sample_delete_act.do");
+		LOGGER.debug(vo.toString());
+		int cnt = conService.delete(vo);
+		model.addAttribute("cnt", cnt);
+		return "sample/rooms_hosting_insert";
+	}
+
+	@RequestMapping(value = "/rooms_hosting_show.do")
+	public String do_rooms_hosting_show(@ModelAttribute("conVO") ConVO vo, ModelMap model) throws Exception {
+		return "sample/rooms_hosting_insert";
+	}
+
+	@RequestMapping(value = "/rooms_hosting_update.do")
+	public String do_jeogi_hosting_update(@ModelAttribute("conVO") ConVO vo, @ModelAttribute("jeogiVO") JeogiVO vo2,
+			@ModelAttribute("precautionsVO") PrecautionsVO vo3, @ModelAttribute("reviewVO") ReviewVO vo4,
+			@ModelAttribute("jeogi_userVO") Jeogi_userVO vo5,
+			@ModelAttribute("roomsReservationVO") RoomsReservationVO vo6, ModelMap model, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		LOGGER.debug("--------------------------------//jeogi_hosting_update.do");
+		LOGGER.debug(vo.toString());
+
+		ConVO c_namervo = conService.select(vo);
+		model.addAttribute("c_namervo", c_namervo);
+
+		JeogiVO rvo = jeogiService.select(vo2);
+		JeogiVO rvo2 = jeogiService.select2(vo2);
+
+		model.addAttribute("rvo", rvo);
+		model.addAttribute("rvo2", rvo2);
+
+		PrecautionsVO prevo = precautionsService.select(vo3);
+		model.addAttribute("prevo", prevo);
+
+		ReviewVO scoreavg = reviewService.scoreAvg(vo4);
+		model.addAttribute("scoreavg", scoreavg);
+
+		List<?> relist = reviewService.selectList(vo4);
+		model.addAttribute("relist", relist);
+
+		Jeogi_userVO uservo = jeogi_userService.selectHost(vo5);
+		model.addAttribute("uservo", uservo);
+
+		List<?> reservationlist = roomsReservationService.selectList(vo6);
+		model.addAttribute("reservationlist", reservationlist);
+
+		List<?> exisitlist = roomsReservationService.selectUpdateRoomreservation(vo6);
+		model.addAttribute("exisitlist", exisitlist);
+
+		List<Map<String, Object>> oneWeekDayList = conService.selectOneWeekDay();
+		model.addAttribute("oneWeekDayList", oneWeekDayList);
+
+		model.addAttribute("rvo", rvo);
+		return "jeogi/rooms_hosting_update";
+	}
+
+	@RequestMapping(value = "/rooms_hosting_update_act.do")
+	public String do_jeogi_hosting_update_act(@ModelAttribute("conVO") ConVO vo,
+			@ModelAttribute("jeogiVO") JeogiVO vo2, @ModelAttribute("precautionsVO") PrecautionsVO vo3,
+			@ModelAttribute("reviewVO") ReviewVO vo4, @ModelAttribute("jeogi_userVO") Jeogi_userVO vo5,
+			@ModelAttribute("roomsReservationVO") RoomsReservationVO vo6, ModelMap model,HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus txStatus = txManager.getTransaction(def);
+		
+		try {
+		LOGGER.debug("--------------------------------//jeogi_hosting_update_act.do");
+		LOGGER.debug(vo.toString());
+		CommonsMultipartFile multipartfile = (CommonsMultipartFile) vo2.getMyfile1();
+		CommonsMultipartFile multipartfile2 = (CommonsMultipartFile) vo2.getMyfile2();
+		CommonsMultipartFile multipartfile3 = (CommonsMultipartFile) vo2.getMyfile3();
+		CommonsMultipartFile multipartfile4 = (CommonsMultipartFile) vo2.getMyfile4();
+		CommonsMultipartFile multipartfile5 = (CommonsMultipartFile) vo2.getMyfile5();
+
+		String file_origin = multipartfile.getOriginalFilename();
+		String file_origin2 = multipartfile2.getOriginalFilename();
+		String file_origin3 = multipartfile3.getOriginalFilename();
+		String file_origin4 = multipartfile4.getOriginalFilename();
+		String file_origin5 = multipartfile5.getOriginalFilename();
+
+		String file_path = "C:/upload/saeil/" + multipartfile.getOriginalFilename() + new Date().getTime();
+		String file_path2 = "C:/upload/saeil/" + multipartfile2.getOriginalFilename() + new Date().getTime();
+		String file_path3 = "C:/upload/saeil/" + multipartfile3.getOriginalFilename() + new Date().getTime();
+		String file_path4 = "C:/upload/saeil/" + multipartfile4.getOriginalFilename() + new Date().getTime();
+		String file_path5 = "C:/upload/saeil/" + multipartfile5.getOriginalFilename() + new Date().getTime();
+
+		File file = new File(file_path);
+		File file2 = new File(file_path2);
+		File file3 = new File(file_path3);
+		File file4 = new File(file_path4);
+		File file5 = new File(file_path5);
+
+		multipartfile.transferTo(file);
+		multipartfile2.transferTo(file2);
+		multipartfile3.transferTo(file3);
+		multipartfile4.transferTo(file4);
+		multipartfile5.transferTo(file5);
+
+		if (file_origin != null) {
+			if (file_origin.length() > 0) {
+				vo2.setR_attach01(file_origin);
+				vo2.setR_path01(file_path);
+			}
+		}
+
+		if (file_origin2 != null) {
+			if (file_origin2.length() > 0) {
+				vo2.setR_attach02(file_origin2);
+				vo2.setR_path02(file_path2);
+			}
+		}
+
+		if (file_origin3 != null) {
+			if (file_origin3.length() > 0) {
+				vo2.setR_attach03(file_origin3);
+				vo2.setR_path03(file_path3);
+			}
+		}
+
+		if (file_origin4 != null) {
+			if (file_origin4.length() > 0) {
+				vo2.setR_attach04(file_origin4);
+				vo2.setR_path04(file_path4);
+			}
+		}
+
+		if (file_origin5 != null) {
+			if (file_origin5.length() > 0) {
+				vo2.setR_attach05(file_origin5);
+				vo2.setR_path05(file_path5);
+			}
+		}
+
+		int rreservedcnt = 0;
+
+		String dates = vo6.getR_date();
+		String[] datearry = dates.split(",");
+		String r_id = vo6.getR_id();
+
+		for (int j = 0; j < datearry.length; j++) {
+			RoomsReservationVO roomscnt = new RoomsReservationVO();
+			vo6.setR_date(datearry[j]);
+			vo6.setR_id(r_id);
+			roomscnt = roomsReservationService.selectCountReserved(vo6);
+			rreservedcnt = roomscnt.getResercedcnt();
+			model.addAttribute("roomscnt", roomscnt);
+
+			if (rreservedcnt >= 1) {
+
+				int hostinguproomreser = roomsReservationService.update(vo6);
+				model.addAttribute("hostinguproomreser", hostinguproomreser);
+
+			} else {
+				int hostinginroomreser = roomsReservationService.insert(vo6);
+				model.addAttribute("hostinginroomreser", hostinginroomreser);
+
+			}
+		}
+		
+	
+
+	int hostingupjeogicnt = jeogiService.update(vo2);
+	int hostingupconcnt = conService.update(vo);
+	int hostingupprecnt = precautionsService.update(vo3);
+
+	model.addAttribute("hostingupjeogicnt",hostingupjeogicnt);
+	model.addAttribute("hostingupconcnt",hostingupconcnt);
+	model.addAttribute("hostingupprecnt",hostingupprecnt);
+	
+	txManager.commit(txStatus); // 정상일경우 COMMIT;
+	model.put("result", 0);
+	
+	return"jeogi/rooms_hosting_update_act";
+	
+		}
+		catch (Exception e) {
+			response.setCharacterEncoding("EUC-KR");
+			PrintWriter out = response.getWriter();
+			e.printStackTrace();
+			out.println("<script type='text/javascript'>");
+			out.println("alert('시스템에 문제가 생겼습니다. 다시 시도하거나 관리자에게 문의바랍니다.')");
+			out.println("history.back()");
+			out.println("</script>");
+			out.flush();
+			txManager.rollback(txStatus); // 에러날경우 CATCH로 빠져서 ROLLBACK;
+			model.put("result", -1);
+
+			return"jeogi/rooms_hosting_update_act";
+		}
+
+	}
+
+	@RequestMapping(value = "/rooms_hosting_delete_act.do")
+	public String do_sample_delete_act(@ModelAttribute("conVO") ConVO vo, @ModelAttribute("jeogiVO") JeogiVO vo2,
+			@ModelAttribute("precautionsVO") PrecautionsVO vo3, @ModelAttribute("jeogi_userVO") Jeogi_userVO vo4,
+			@ModelAttribute("roomsReservationVO") RoomsReservationVO vo5, @ModelAttribute("reviewVO") ReviewVO vo6,
+			ModelMap model) throws Exception {
+		LOGGER.debug("--------------------------------//sample_delete_act.do");
+		LOGGER.debug(vo.toString());
+
+		int precnt = precautionsService.delete(vo3);
+		int roomcnt = jeogiService.delete(vo2);
+		int resercnt = roomsReservationService.delete(vo5);
+		int concnt = conService.delete(vo);
+		int reviewcnt = reviewService.delete(vo6);
+
+		model.addAttribute("precnt", precnt);
+		model.addAttribute("roomcnt", roomcnt);
+		model.addAttribute("resercnt", resercnt);
+		model.addAttribute("concnt", concnt);
+		model.addAttribute("reviewcnt", reviewcnt);
+
+		return "jeogi/rooms_hosting_delete_act";
+	}
+	@RequestMapping(value = "/review_insert_act.do")
+	public String do_review_insert_act(@ModelAttribute("conVO") ConVO vo, @ModelAttribute("jeogiVO") JeogiVO vo2,
+			@ModelAttribute("precautionsVO") PrecautionsVO vo3, @ModelAttribute("reviewVO") ReviewVO vo4,
+			@ModelAttribute("jeogi_userVO") Jeogi_userVO vo5,HttpServletRequest request,
+			@ModelAttribute("roomsReservationVO") RoomsReservationVO vo6, ModelMap model) throws Exception {
+		
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus txStatus = txManager.getTransaction(def);
+		
+		LOGGER.debug("--------------------------------//review_insert_act.do");
+		LOGGER.debug(vo.toString());	
+		ConVO c_namervo = conService.select(vo);
+		model.addAttribute("c_namervo", c_namervo);
+
+		JeogiVO rvo = jeogiService.select(vo2);
+		JeogiVO rvo2 = jeogiService.select2(vo2);
+
+		model.addAttribute("rvo", rvo);
+		model.addAttribute("rvo2", rvo2);
+
+		PrecautionsVO prevo = precautionsService.select(vo3);
+		model.addAttribute("prevo", prevo);
+
+		ReviewVO scoreavg = reviewService.scoreAvg(vo4);
+		model.addAttribute("scoreavg", scoreavg);
+
+		List<?> relist = reviewService.selectList(vo4);
+		model.addAttribute("relist", relist);
+
+		Jeogi_userVO uservo = jeogi_userService.selectHost(vo5);
+		model.addAttribute("uservo", uservo);
+
+		List<?> reservationlist = roomsReservationService.selectList(vo6);
+		model.addAttribute("reservationlist", reservationlist);
+		
+		String r_id = request.getParameter("r_id");
+		
+		System.out.println("r_id"+r_id);
+		model.addAttribute("r_id", request.getParameter("r_id"));
+		
+		int cnt = reviewService.insert(vo4);
+		model.addAttribute("cnt", cnt);
+		
+		
+		return "sample/review_insert_act";
+	}	
+	@RequestMapping(value = "/review_delete_act.do")
+	public String do_sample_delete_act( @ModelAttribute("reviewVO") ReviewVO vo,@ModelAttribute("jeogi_userVO") Jeogi_userVO vo2,HttpServletRequest request, ModelMap model) throws Exception {
+		LOGGER.debug("--------------------------------//review_delete_act.do");
+		LOGGER.debug(vo.toString());
+		
+		String user_name =  request.getParameter("user_name");
+		String user_namese =  request.getParameter("user_namese");
+		
+		System.out.println("user_name"+user_name);
+		System.out.println("user_namese"+user_namese);
+		
+		
+		if(user_name.equals(user_namese)) {
+			vo.setUser_name(user_name);
+			int cnt = reviewService.delete(vo);
+			model.addAttribute("cnt", cnt);
+		}
+		else
+			System.out.println("Fail");
+		
+		
+		String r_id = request.getParameter("r_id");
+		
+		System.out.println("r_id"+r_id);
+		model.addAttribute("r_id", request.getParameter("r_id"));
+		
+		return "sample/review_delete_act";
+	}
+	@RequestMapping(value = "/interest_add.do")
+	public String do_sample_update_act(@ModelAttribute("roomsVO") JeogiVO vo, ModelMap model,HttpServletRequest request) throws Exception {
+		LOGGER.debug("--------------------------------//interest_add.do");
+		LOGGER.debug(vo.toString());		
+		int cnt = jeogiService.updateInterest(vo);
+
+		String r_id = request.getParameter("r_id");
+		
+		System.out.println("interest_addr_id"+r_id);
+		model.addAttribute("r_id", request.getParameter("r_id"));
+		
+		
+		model.addAttribute("cnt", cnt);
+		return "sample/interest_add";
+	}	
+}

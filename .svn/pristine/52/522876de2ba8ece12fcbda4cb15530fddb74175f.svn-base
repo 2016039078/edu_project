@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="likelist">
+
+
+<!-- 	<select id="select" resultType="jeogiVO"> -->
+
+<!-- 			SELECT -->
+<!-- 				* -->
+<!-- 			FROM USER -->
+<!-- 			WHERE USER_ID=#{user_id} -->
+<!-- 	</select> -->
+
+<!-- 	<select id="selectList" parameterType="jeogi_userVO" resultType="jeogi_userVO"> -->
+
+<!-- 			SELECT -->
+<!-- 				* -->
+<!-- 			FROM USER -->
+<!-- 			WHERE 1=1 -->
+<!-- 			<if test="searchKeyword != null and searchKeyword != ''"> -->
+<!-- 		        <choose> -->
+<!-- 		            <when test="searchCondition == 0"> -->
+<!-- 						AND	ID LIKE '%' || #{searchKeyword} || '%' -->
+<!-- 					</when> -->
+<!-- 		            <when test="searchCondition == 1"> -->
+<!-- 						AND	NAME LIKE '%' || #{searchKeyword} || '%' -->
+<!-- 					</when> -->
+<!-- 				</choose> -->
+<!-- 			</if> -->
+<!-- 			ORDER BY USER_ID DESC -->
+<!-- 			LIMIT #{recordCountPerPage} OFFSET #{firstIndex} -->
+<!-- 	</select> -->
+
+<!-- 	<select id="selectListTotCnt" parameterType="jeogi_userVO" resultType="int"> -->
+
+<!-- 			SELECT COUNT(*) totcnt -->
+<!-- 			FROM USER -->
+<!-- 			WHERE 1=1 -->
+<!-- 			<if test="searchKeyword != null and searchKeyword != ''"> -->
+<!-- 		        <choose> -->
+<!-- 		            <when test="searchCondition == 0"> -->
+<!-- 						AND ID LIKE '%' || #{searchKeyword} || '%' -->
+<!-- 					</when> -->
+<!-- 		            <when test="searchCondition == 1"> -->
+<!-- 						AND	NAME LIKE '%' || #{searchKeyword} || '%' -->
+<!-- 					</when> -->
+<!-- 				</choose> -->
+<!-- 			</if> -->
+<!-- 	</select> -->
+	
+		<select id="select" parameterType="string" resultType ="likelistVO">
+			SELECT
+				LIKE_ID,
+				R.R_ID,
+				L.USER_ID,
+				USER_NAME,
+				R_TITLE,
+				R_ATTACH01,
+				R_PATH01
+				
+			FROM USER U, LIKELIST L, ROOMS R
+			WHERE U.USER_ID = L.USER_ID AND
+			L.R_ID = R.R_ID AND
+			L.USER_ID = #{user_id} 
+		
+		</select>
+		
+		<select id="selectList" parameterType="likelistVO" resultType="likelistVO">
+
+			SELECT R_TITLE, R_PATH01, R_ATTACH01, LIKE_ID
+			FROM LIKELIST 
+			JOIN ROOMS 
+			ON LIKELIST.R_ID = ROOMS.R_ID
+			WHERE LIKELIST.USER_ID =#{user_id}
+			ORDER BY LIKE_ID DESC
+			
+			
+	</select>
+	
+		<update id="insert" parameterType="likelistVO" >
+
+			
+			INSERT INTO LIKELIST
+			( 
+				USER_ID,
+				R_ID
+			 )
+			 VALUES
+			 (
+			 	#{user_id},
+			 	#{r_id}
+			 )		  			  
+
+	</update>	
+
+
+</mapper>

@@ -1,0 +1,336 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Horizons by TEMPLATED</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery.dropotron.min.js"></script>
+<script src="js/skel.min.js"></script>
+<script src="js/skel-layers.min.js"></script>
+<script src="js/init.js"></script>
+<link rel="stylesheet" href="skel.css">
+<link rel="stylesheet" href="style.css">
+<script src="jquery-3.5.1.js"></script>
+<style type="text/css">
+#header {
+	background: url("paris-4793193_1920.jpg") no-repeat;
+	background-size: cover;
+	color: #fff;
+	padding: 6em 0;
+	text-align: center;
+	background-position: 0% 65%;
+	position: relative;
+}
+
+#header:before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background: url("paris-4793193_1920.jpg") no-repeat;
+}
+
+.dropdown-content1 {
+	display: none;
+	position: absolute;
+	background-color: rgba(245, 222, 179, 0.5);
+	min-width: 160px;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.7);
+	z-index: 0;
+}
+
+.dropdown-content1 a {
+	color: white;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
+	text-align: left;
+}
+
+.dropdown-content1 a:hover {
+	background-color: rgba(245, 222, 185, 0.7);
+}
+
+.dropdown:hover .dropdown-content1 {
+	display: inline-table;
+}
+
+.dropdown-content {
+	display: none;
+	position: absolute;
+	background-color: rgba(245, 222, 179, 0.5);
+	min-width: 160px;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.7);
+	z-index: 1;
+}
+
+.dropdown-content a {
+	color: white;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
+	text-align: left;
+}
+
+.dropdown-content a:hover {
+	background-color: rgba(245, 222, 185, 0.7);
+}
+
+.dropdown:hover .dropdown-content {
+	display: block;
+}
+
+.login {
+	float: right;
+	margin: 1%;
+}
+
+.username {
+	display: inline-block;
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+	background-color: rgba(100, 0, 90, 0.4);
+}
+</style>
+<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
+<script>
+	function fn_search(area) {
+		document.frm.area.value = area;
+		document.frm.action = "<c:url value='/rooms_search01.do'/>";
+		document.frm.submit();
+	}
+	
+	function fn_hostinglist(user_id) {
+		document.frm2.user_id.value = user_id;
+		document.frm2.action = "<c:url value='/jeogi_hosting_select.do'/>";
+		document.frm2.submit();
+	}
+	function fn_userupdate(user_id) {
+		document.frm2.user_id.value = user_id;
+		document.frm2.action = "<c:url value='/jeogi_user_update.do'/>";
+		document.frm2.submit();
+		
+	}
+	
+	function fn_likelist(user_id) {
+		document.frm2.user_id.value = user_id;
+		document.frm2.action = "<c:url value='/likelist_select.do'/>";
+		document.frm2.submit();
+		
+	}
+	
+	function fn_messenger(user_id) {
+		document.frm2.user_id.value = user_id;
+		document.frm2.action = "<c:url value='/messenger_select.do'/>";
+		document.frm2.submit();
+		
+	}
+	
+	
+</script>
+
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCMFoUT6tZhqMk9iy6IrCEO39gxChZYucA&callback=initMap" async="" defer=""></script> -->
+</head>
+<body class="homepage">
+<!-- <button id="getLocation" type="button">위치 정보 수집</button> <div id="map" style="width:500px; height: 500px;display: block;"></div>  -->
+
+	<!-- Header -->
+	<div id="header">
+		<div class="container">
+			<!-- Logo -->
+			<h1>
+				<a href="index.jsp" id="logo">WATP</a>
+			</h1>
+			<div class="login">
+				<c:if test="${empty userSession }">
+					<a href="jeogi_user_insert.do">회원가입</a>
+					<a href="login.do">로그인</a>
+				</c:if>
+
+				<c:if test="${!empty userSession }">
+					<div class="dropdown">
+						<div class="username">${userSession.user_name}님</div>
+						<div class="dropdown-content1" style="margin-top: 20px;">
+							<form action="jeogi_hosting_select.do" method=post id="frm2" name="frm2" >
+							<input type="hidden" name="user_id" id="user_id" value="${userSession.user_id}">
+							<a href="javascript:fn_hostinglist('<c:out value="${userSession.user_id}"/>')"><c:out value="${userSession.user_id}"/>호스팅관리</a></form>
+							<a href="javascript:fn_userupdate('<c:out value="${userSession.user_id}"/>')"><c:out value="${userSession.user_id}"/>정보수정</a>
+							<a href="javascript:fn_messenger('<c:out value="${userSession.user_id}"/>')"><c:out value="${userSession.user_id}"/>">메세지</a> 
+							<a href="javascript:fn_likelist('<c:out value="${userSession.user_id}"/>')"><c:out value="${userSession.user_id}"/>찜목록</a>
+							<a href="#">여행</a>
+						</div>
+						<a class="logout" href="logout_act.do">로그아웃</a>
+
+					</div>
+				</c:if>
+			</div>
+			<!-- Nav -->
+			
+			<nav id="nav">
+				<ul>
+
+					<li class="dropdown a"><a href="rooms_search02.do">숙소예약</a></li>
+					<li class="dropdown a"><a href="index.html">온라인체험</a></li>
+					<li class="dropdown a"><a href="javascript:void(0)" class="dropbtn">커뮤니티</a>
+						<div class="dropdown-content a">
+							<a href="#">공지사항</a> <a href="jeogi_suggestions_select.do">1:1문의</a> <a href="jeogi_faq_select.do">자주 묻는 질문</a>
+						</div></li>
+					<li class="a"><a href="rooms_hosting_insert.do">호스팅하기</a></li>
+				</ul>
+			</nav>
+
+
+			<!-- Banner -->
+			<form action="rooms_search01.do" method=post id="frm" name="frm">
+				<div id="banner">
+					<div class="container">
+						<section>
+							<header class="major">
+								<h2>Welcome to 'What about this place?'</h2>
+								<input type="text" id="area" name="area" placeholder="지역이름을 입력하세요." style="height: 50px; background-color: white; color: black; margin-bottom: 5%">
+								<button class="button alt" type="submit">검색</button>
+							</header>
+
+						</section>
+					</div>
+				</div>
+			</form>
+
+		</div>
+	</div>
+
+	<!-- Featured -->
+	<div class="wrapper style2">
+		<section class="container">
+			<header class="major">
+				<h2>Nulla luctus eleifend</h2>
+				<span class="byline">Mauris vulputate dolor sit amet nibh</span>
+			</header>
+			<div class="row no-collapse-1">
+				<section class="4u">
+					<a href="#" class="image feature"><img src="images/pic02.jpg" alt=""></a>
+					<p>Nam in massa. Sed vel tellus. Curabitur sem urna, consequat vel, suscipit in, mattis placerat.</p>
+				</section>
+				<section class="4u">
+					<a href="#" class="image feature"><img src="images/pic03.jpg" alt=""></a>
+					<p>Donec ornare neque ac sem. Mauris aliquet. Aliquam sem leo, vulputate sed, convallis. Donec magna.</p>
+				</section>
+				<section class="4u">
+					<a href="#" class="image feature"><img src="images/pic04.jpg" alt=""></a>
+					<p>Curabitur sem urna, consequat vel, suscipit convallis sem leo, mattis placerat, nulla. Sed ac leo.</p>
+				</section>
+
+			</div>
+		</section>
+	</div>
+
+	<!-- Main -->
+	<div id="main" class="wrapper style1">
+		<section class="container">
+			<header class="major">
+				<h2>Nulla luctus eleifend</h2>
+				<span class="byline">Mauris vulputate dolor sit amet nibh</span>
+			</header>
+			<div class="row">
+
+				<!-- Content -->
+				<div class="6u">
+					<section>
+						<ul class="style">
+							<li><span class="fa fa-wrench"></span>
+								<h3>Integer ultrices</h3> <span>In posuere eleifend odio. Quisque semper augue mattis wisi. Maecenas ligula. Pellentesque viverra vulputate enim.</span></li>
+							<li><span class="fa fa-cloud"></span>
+								<h3>Aliquam luctus</h3> <span>Pellentesque viverra vulputate enim. Aliquam erat volutpat. Maecenas condimentum enim tincidunt risus accumsan.</span></li>
+						</ul>
+					</section>
+				</div>
+				<div class="6u">
+					<section>
+						<ul class="style">
+							<li><span class="fa fa-cogs"></span>
+								<h3>Integer ultrices</h3> <span>In posuere eleifend odio. Quisque semper augue mattis wisi. Maecenas ligula. Pellentesque viverra vulputate enim.</span></li>
+							<li><span class="fa fa-leaf"></span>
+								<h3>Aliquam luctus</h3> <span>Pellentesque viverra vulputate enim. Aliquam erat volutpat. Maecenas condimentum enim tincidunt risus accumsan.</span></li>
+						</ul>
+					</section>
+				</div>
+		<div>
+			<a href ="jeogi_user_detail.do">개인정보 수정(수정중)</a>
+			<a href ="jeogi_user_insert.do">회원가입</a>
+			<a href = "login.do">로그인</a>
+			<a href = "likelist_select.do">찜목록(수정중)</a>
+			<a href = "rooms_detail.do">방 상세정보</a>
+		</div>
+		
+			</div>
+		</section>
+	</div>
+
+	<!-- Footer -->
+	<div id="footer">
+		<div class="container">
+
+			<!-- Lists -->
+			<div class="row">
+				<div class="8u">
+					<section>
+						<header class="major">
+							<h2>Donec dictum metus</h2>
+							<span class="byline">Quisque semper augue mattis wisi maecenas ligula</span>
+						</header>
+						<div class="row">
+							<section class="6u">
+								<ul class="default">
+									<li><a href="#">Pellentesque elit non gravida blandit.</a></li>
+									<li><a href="#">Lorem ipsum dolor consectetuer elit.</a></li>
+									<li><a href="#">Phasellus nibh pellentesque congue.</a></li>
+									<li><a href="#">Cras vitae metus aliquam pharetra.</a></li>
+								</ul>
+							</section>
+							<section class="6u">
+								<ul class="default">
+									<li><a href="#">Pellentesque elit non gravida blandit.</a></li>
+									<li><a href="#">Lorem ipsum dolor consectetuer elit.</a></li>
+									<li><a href="#">Phasellus nibh pellentesque congue.</a></li>
+									<li><a href="#">Cras vitae metus aliquam pharetra.</a></li>
+								</ul>
+							</section>
+						</div>
+					</section>
+				</div>
+				<div class="4u">
+					<section>
+						<header class="major">
+							<h2>Donec dictum metus</h2>
+							<span class="byline">Mattis wisi maecenas ligula</span>
+						</header>
+						<ul class="contact">
+							<li><span class="address">Address</span> <span>1234 Somewhere Road #4285 <br />Nashville, TN 00000
+							</span></li>
+							<li><span class="mail">Mail</span> <span><a href="#">someone@untitled.tld</a></span></li>
+							<li><span class="phone">Phone</span> <span>(000) 000-0000</span></li>
+						</ul>
+					</section>
+				</div>
+			</div>
+
+			<!-- Copyright -->
+			<div class="copyright">
+				Design: <a href="http://templated.co">TEMPLATED</a> Images: <a href="http://unsplash.com">Unsplash</a> (<a href="http://unsplash.com/cc0">CC0</a>)
+			</div>
+
+		</div>
+	</div>
+
+</body>
+</html>

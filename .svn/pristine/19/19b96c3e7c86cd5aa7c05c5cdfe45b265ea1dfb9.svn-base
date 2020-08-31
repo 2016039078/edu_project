@@ -1,0 +1,61 @@
+
+package kr.co.ncspartner.vo;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import egovframework.example.cmmn.vo.DefaultVO;
+
+public class RoomsReservationVO extends DefaultVO {
+	private String r_id;
+	private String user_id;
+	private String r_date;
+	private String reservation_yn;
+	
+	
+	public String getReservation_yn() {
+		return reservation_yn;
+	}
+
+
+	public void setReservation_yn(String reservation_yn) {
+		this.reservation_yn = reservation_yn;
+	}
+
+	
+	
+	public String getR_id() {
+		return r_id;
+	}
+
+
+	public void setR_id(String r_id) {
+		this.r_id = r_id;
+	}
+
+
+	public String getUser_id() {
+		return user_id;
+	}
+
+
+	public void setUser_id(String user_id) {
+		this.user_id = user_id;
+	}
+
+
+	public String getR_date() {
+		return r_date;
+	}
+
+
+	public void setR_date(String r_date) {
+		this.r_date = r_date;
+	}
+
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
+
+}

@@ -1,0 +1,59 @@
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ taglib prefix="c"      uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form"   uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="ui"     uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>게시판</title>
+    <script type="text/javaScript" language="javascript" defer="defer">
+        
+	    function fn_update_act() {
+	       	document.frm.action = "<c:url value='/jeogi_user_update_act.do'/>";
+	       	document.frm.submit();
+	    }
+
+        function fn_selectlist() {
+        	document.frm.action = "<c:url value='/jeogi_user_select.do'/>";
+           	document.frm.submit();
+        }
+        
+        function fn_link_page(pageNo){
+        	document.frm.pageIndex.value = pageNo;
+        	document.frm.action = "<c:url value='/jeogi_user_select.do'/>";
+           	document.frm.submit();
+        }
+        
+    </script>
+</head>
+
+<body>
+	<form id="frm" name="frm" action="jeogi_user_select.do" method="post">
+        <input type="hidden" name="email" value="${jeogi_userVO.email}" />
+        <input type="hidden" name="pageIndex" id="pageIndex" value="${jeogi_userVO.pageIndex}" />
+       	<a href="javascript:fn_update_act();">저장하시겠습니까</a>
+		
+		<table border="1">
+			<tr>	
+				<td>이름</td>
+				<td><input name="user_name" value="${rvo.user_name}"  /></td>
+			</tr>
+			<tr>	
+				<td>이메일주소</td>
+				<td><input name="email" value="${rvo.email}"  /></td>
+			</tr>
+			<tr>	
+				<td>생년월일</td>
+				<td><input name="user_birth" value="${rvo.user_birth}"  /></td>
+			</tr>
+			<tr>	
+				<td>핸드폰 번호</td>
+				<td><input name="user_ph" value="${rvo.user_ph}"  /></td>
+			</tr>									
+			
+		</table>
+    </form>
+</body>
+</html>

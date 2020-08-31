@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="con">
+
+	<update id="insert" parameterType="conVO" >
+			INSERT INTO convenient (r_id ,c_name01,c_name02,c_name03,c_name04,c_name05,c_name06,c_name07,c_name08,c_name09,c_name10,c_name11,c_name12,c_name13) SELECT CONCAT('r', (SELECT LPAD(COUNT(*)+1,3,'0') FROM convenient))
+			,
+			 #{c_name01}, #{c_name02}, #{c_name03}, #{c_name04}, #{c_name05}, #{c_name06}, #{c_name07}, #{c_name08}, #{c_name09}, #{c_name10}, #{c_name11}, #{c_name12}, #{c_name13}
+
+	</update>
+
+	<update id="update"  parameterType="conVO" >
+
+			UPDATE 
+			CONVENIENT
+			SET  
+			 C_NAME01=#{c_name01}
+			,C_NAME02=#{c_name02}
+			,C_NAME03=#{c_name03}
+			,C_NAME04=#{c_name04}
+			,C_NAME05=#{c_name05}
+			,C_NAME06=#{c_name06}
+			,C_NAME07=#{c_name07}
+			,C_NAME08=#{c_name08}
+			,C_NAME09=#{c_name09}
+			,C_NAME10=#{c_name10}
+			,C_NAME11=#{c_name11}
+			,C_NAME12=#{c_name12}
+			,C_NAME13=#{c_name13}		
+			WHERE R_ID=#{r_id}
+
+	</update>
+
+	<update id="delete"  parameterType="conVO">
+
+			DELETE FROM CONVENIENT
+			WHERE R_ID=#{r_id}
+
+	</update>
+
+	<select id="select" resultType="conVO">
+
+			SELECT
+				c_name01,c_name02,c_name03,c_name04,c_name05,c_name06,c_name07,c_name08,c_name09,c_name10,c_name11,c_name12,c_name13
+			FROM CONVENIENT
+			WHERE R_ID=#{r_id}
+
+	</select>
+
+	<select id="selectList" parameterType="conVO" resultType="conVO">
+
+			SELECT
+				c_name01,c_name02,c_name03,c_name04,c_name05,c_name06,c_name07,c_name08,c_name09,c_name10,c_name11,c_name12,c_name13
+			FROM CONVENIENT
+			WHERE R_ID=#{r_id}
+	</select>
+
+	<select id="selectListTotCnt" parameterType="conVO" resultType="int">
+
+			SELECT COUNT(*) totcnt
+			FROM CONVENIENT
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+		        <choose>
+		            <when test="searchCondition == 0">
+						AND ID LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 1">
+						AND	NAME LIKE '%' || #{searchKeyword} || '%'
+					</when>
+				</choose>
+			</if>
+	</select>
+
+	<select id="selectOneWeekDay" resultType="java.util.HashMap">
+		SELECT TA.ONE_WEEK
+		     , TA.DAY
+		FROM
+		(
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 0 ) AS ONE_WEEK, '월요일' AS DAY
+			UNION ALL
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 1 ), '화요일' AS DAY
+			UNION ALL
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 2 ), '수요일' AS DAY
+			UNION ALL
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 3 ), '목요일' AS DAY
+			UNION ALL
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 4 ), '금요일' AS DAY
+			UNION ALL
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 5 ), '토요일' AS DAY
+			UNION ALL
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 6 ), '일요일' AS DAY
+		) TA
+		WHERE TA.ONE_WEEK >= CURDATE()
+	</select>
+	
+	
+
+</mapper>

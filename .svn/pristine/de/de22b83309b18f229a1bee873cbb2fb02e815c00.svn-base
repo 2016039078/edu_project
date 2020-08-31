@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="messenger">
+	
+
+	<select id="selectList" parameterType="MessengerVO" resultType="MessengerVO">
+
+		SELECT
+				MS_ID,
+				R.R_ID,
+				M.USER_ID,
+				R_TITLE,
+				MS_SEQ,
+				MS_MESSAGE,
+				M_DATETIME
+				
+			FROM USER U, MESSENGER M, ROOMS R
+			WHERE U.USER_ID = M.USER_ID AND
+			M.R_ID = R.R_ID AND
+			M.USER_ID = #{user_id}
+
+	</select>
+
+	<select id="selectListTotCnt" parameterType="MessengerVO" resultType="int">
+
+			SELECT COUNT(*) totcnt
+			FROM MESSENGER
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+		        <choose>
+		            <when test="searchCondition == 0">
+						AND ID LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 1">
+						AND	NAME LIKE '%' || #{searchKeyword} || '%'
+					</when>
+				</choose>
+			</if>
+	</select>
+
+</mapper>

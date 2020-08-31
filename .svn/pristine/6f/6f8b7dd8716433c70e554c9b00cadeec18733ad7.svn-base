@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jeogi_suggestions">
+
+<update id="insert" parameterType="jeogi_suggestionsVO" >
+
+			INSERT INTO SUGGESTIONS
+			( 
+
+				SUG_USER_ID,
+				SUG_CONTENT,
+				SUG_DATE
+			)
+				
+			VALUES 	
+			( 
+
+				#{sug_user_id},
+				#{sug_content},
+				#{sug_date}
+				
+			)
+			
+		
+
+	</update>
+
+	<update id="update"  parameterType="jeogi_suggestionsVO" >
+
+			UPDATE SUGGESTIONS
+			SET 
+				SUG_SEQ=#{sug_seq},
+				SUG_USER_ID=#{sug_user_id},
+				SUG_CONTENT=#{sug_content},
+				SUG_DATE=#{sug_date},
+				
+			WHERE SUG_SEQ=#{sug_seq}
+
+	</update>
+	
+	
+
+	<update id="delete"  parameterType="jeogi_suggestionsVO">
+
+			DELETE FROM SUGGESTIONS
+			WHERE SUG_SEQ=#{sug_seq}
+
+	</update>
+
+	<select id="select" resultType="jeogi_suggestionsVO">
+
+			SELECT
+				SUG_SEQ,
+				SUG_USER_ID,
+				SUG_CONTENT,
+				SUG_DATE
+			FROM SUGGESTIONS
+			WHERE SUG_SEQ=#{sug_seq}
+	</select>
+	
+	<select id="selectList" parameterType="jeogi_suggestionsVO" resultType="jeogi_suggestionsVO">
+
+			SELECT
+				SUG_SEQ,
+				SUG_USER_ID,
+				SUG_CONTENT,
+				SUG_DATE
+			FROM SUGGESTIONS
+
+			ORDER BY SUG_USER_ID DESC
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+			
+	<select id="selectListTotCnt" parameterType="jeogi_suggestionsVO" resultType="int">
+
+			SELECT COUNT(*) totcnt
+			FROM SUGGESTIONS
+			WHERE 1=1
+
+	</select>
+</mapper>

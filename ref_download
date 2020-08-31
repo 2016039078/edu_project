@@ -1,0 +1,59 @@
+	@RequestMapping(value = "/download.do")
+	public void managerImagedownload(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		FileInputStream fis = null;
+		BufferedInputStream in = null;
+		ByteArrayOutputStream bStream = null;
+
+		String fileoriginal = request.getParameter("file_origin"); // 원래이름
+		String fullpath = request.getParameter("file_path"); // 원래이름
+
+		String type = "";
+		String charset = "UTF-8";
+		String userAgent = request.getHeader("User-Agent");
+
+		// String fullpath = ThumbnailUtil.getRealdir() + File.separator +
+		// "manager" + File.separator + "organization" + File.separator +
+		// file_origin;
+
+		File file = new File(fullpath);
+		String mimetype = request.getSession().getServletContext().getMimeType(file.getName());
+
+		response.setHeader("Content-Type", type);
+		response.setCharacterEncoding(charset);
+		response.setContentType(mimetype + "; charset=" + charset);
+
+		if (mimetype == null || mimetype.length() == 0) {
+			mimetype = "application/octet-stream;";
+		}
+
+		if (userAgent.indexOf("MSIE 5.5") > -1) { // MS IE 5.5 이하
+			response.setHeader("Content-Disposition", "filename=" + URLEncoder.encode(fileoriginal, charset) + ";");
+		} else if (userAgent.indexOf("MSIE") > -1) { // MS IE (보통은 6.x 이상 가정)
+			response.setHeader("Content-Disposition", "attachment; filename=" + java.net.URLEncoder.encode(fileoriginal, charset) + ";");
+		} else { // 모질라나 오페라
+			response.setHeader("Content-Disposition", "attachment; filename=" + new String(fileoriginal.getBytes(charset), "latin1") + ";");
+		}
+
+		if (file.isFile()) {
+			fis = new FileInputStream(file);
+			in = new BufferedInputStream(fis);
+			bStream = new ByteArrayOutputStream();
+
+			int readBytes = 0;
+
+			while ((readBytes = in.read()) != -1) {
+				bStream.write(readBytes);
+			}
+
+			response.setContentLength(bStream.size());
+			bStream.writeTo(response.getOutputStream());
+
+			response.getOutputStream().flush();
+			response.getOutputStream().close();
+			bStream.close();
+			in.close();
+			fis.close();
+
+		}
+	}

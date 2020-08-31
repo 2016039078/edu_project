@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jeogi">
+
+	<resultMap type="jeogiVO" id="jeogiMap">
+		<result column="R_INTRO" property="r_intro" javaType="java.lang.String" jdbcType="LONGVARCHAR"/>
+	</resultMap>
+
+	<update id="insert" parameterType="jeogiVO" >
+
+		INSERT INTO ROOMS 
+		(
+				r_id 
+				,r_title
+				, r_intro
+				, r_price
+				, lat
+				, lon
+				, max_p
+				, bed
+				, bedroom
+				, address
+				, type
+				, housing_type
+				, user_id
+				, r_like
+				, r_attach01
+				, r_path01
+				, r_attach02
+				, r_path02
+				, r_attach03
+				, r_path03
+				, r_attach04
+				, r_path04
+				, r_attach05
+				, r_path05
+				, rhost_date
+		) 
+				SELECT CONCAT('r', (SELECT LPAD(MAX(no)+1,3,'0') FROM ROOMS ))
+				,#{r_title}
+				,#{r_intro}
+				,#{r_price}
+				, #{lat}
+				, #{lon}
+				, #{max_p}
+				, #{bed}
+				, #{bedroom}
+				, #{address}
+				, #{type}
+				, #{housing_type}
+				, #{user_id}
+				, 0
+				, #{r_attach01}
+				, #{r_path01}
+				, #{r_attach02}
+				, #{r_path02}
+				, #{r_attach03}
+				, #{r_path03}
+				, #{r_attach04}
+				, #{r_path04}
+				, #{r_attach05}
+				, #{r_path05}
+				, DATE_FORMAT(NOW(), '%Y%m%d%h%m%s')
+
+				
+	</update>
+
+	<update id="update"  parameterType="jeogiVO" >
+
+			UPDATE ROOMS
+			SET 
+				  r_title =#{r_title}
+				, r_intro =#{r_intro}
+				, r_price =#{r_price}
+				, lat = #{lat}
+				, lon = #{lon}
+				, max_p =#{max_p}
+				, bed =#{bed}
+				, bedroom =#{bedroom}
+				, address =#{address}
+				, type =#{type}
+				, housing_type =#{housing_type}
+				, r_attach01 =#{r_attach01}
+				, r_path01 =#{r_path01}
+				, r_attach02 =#{r_attach02}
+				, r_path02 =#{r_path02}
+				, r_attach03 =#{r_attach03}
+				, r_path03 =#{r_path03}
+				, r_attach04 =#{r_attach04}
+				, r_path04 =#{r_path04}
+				, r_attach05 =#{r_attach05}
+				, r_path05 =#{r_path05}
+				, rhost_date = DATE_FORMAT(NOW(), '%Y%m%d%h%m%s')
+				
+			WHERE R_ID=#{r_id}
+
+	</update>
+	
+		<update id="updateInterest"  parameterType="jeogiVO" >
+
+			UPDATE ROOMS
+			SET 
+			R_LIKE = R_LIKE+1			
+			WHERE R_ID= #{r_id}
+
+	</update>
+
+	<update id="delete"  parameterType="jeogiVO">
+
+			DELETE FROM ROOMS
+			WHERE R_ID=#{r_id}
+
+	</update>
+
+	<select id="select" resultType="jeogiVO">
+		/* jeogi.select */
+		SELECT
+			*
+		FROM rooms
+		WHERE R_ID =#{r_id}
+
+	</select>
+	
+	<select id="select2" resultMap="jeogiMap">
+		/* jeogi.select2 */
+		SELECT
+			R_INTRO
+		FROM ROOMS
+		WHERE R_ID =#{r_id}
+
+	</select>
+	
+	<select id="selectsearchList" parameterType="jeogiVO" resultType="jeogiVO">
+		SELECT
+			*
+		FROM rooms
+	</select>
+	
+	<select id="selectList" parameterType="jeogiVO" resultType="jeogiVO">
+		SELECT
+			*
+		FROM rooms
+		WHERE address LIKE CONCAT('%',#{area},'%')
+	</select>
+	
+	<select id="selectListHosting" parameterType="jeogiVO" resultType="jeogiVO">
+		SELECT *
+		FROM USER
+		JOIN ROOMS
+		ON ROOMS.USER_ID = USER.USER_ID
+		WHERE USER.USER_ID =#{user_id}
+	</select>
+	
+	<select id="selectListRecentlyUpdate" parameterType="jeogiVO" resultType="jeogiVO">
+		SELECT R_TITLE, R_PATH01, R_ATTACH01
+		FROM ROOMS
+		ORDER BY ROOMS.RHOST_DATE DESC
+		LIMIT 3
+	</select>
+	
+
+	<select id="selectListTotCnt" parameterType="jeogiVO" resultType="int">
+		SELECT COUNT(*) totcnt
+		FROM rooms
+		WHERE 1=1
+		<if test="searchKeyword != null and searchKeyword != ''">
+	        <choose>
+	            <when test="searchCondition == 0">
+					AND ID LIKE '%' || #{searchKeyword} || '%'
+				</when>
+	            <when test="searchCondition == 1">
+					AND	NAME LIKE '%' || #{searchKeyword} || '%'
+				</when>
+			</choose>
+		</if>
+	</select>
+
+	<select id="selectListbestrooms" parameterType="jeogiVO" resultType="jeogiVO">
+		SELECT * FROM ROOMS WHERE ROOMS.R_LIKE LIMIT 4
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,31 @@
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ taglib prefix="c"      uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form"   uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="ui"     uri="http://egovframework.gov/ctl/ui"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>저장목록</title>
+    <script type="text/javaScript" language="javascript" defer="defer">
+   
+        
+    </script>
+</head>
+
+<body>
+	<h1>저장목록입니다</h1>
+	
+	<c: forEach var="row" items="${map.list}" varStatus="i">
+		<div class = likelistbody>
+			<div class = listline>
+				<input type="hidden" name = "r_id" value=${row.r_id}>
+				<div><a href="${path}/rooms_detail.do?r_id=${row.r_id}"></a></div>
+				<div>value=${row.r_title}</div>
+			</div>
+			<div><a href="likelist_delete.do?like_id=${row.like_id}">삭제</a></div>
+		</div>
+	</c: forEach>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+ "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+
+<tiles-definitions>
+	<definition name="bTemplate" template="/WEB-INF/tiles/b_layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/tiles/b_header.jsp" />
+		<put-attribute name="content" value="/WEB-INF/tiles/b_content.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/b_footer.jsp" />
+	</definition>
+	<definition name="sample/*" extends="bTemplate">
+		<put-attribute name="content" value="/WEB-INF/jsp/egovframework/example/sample/{1}.jsp" />
+	</definition>
+	
+	
+	<definition name="mainTemplate" template="/WEB-INF/tiles/b_layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/tiles/b_header.jsp" />
+		<put-attribute name="content" value="/WEB-INF/tiles/b_content.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/b_footer.jsp" />
+	</definition>
+	<definition name="index" extends="mainTemplate">
+		<put-attribute name="content" value="index.jsp" />
+	</definition>
+	
+	
+</tiles-definitions>

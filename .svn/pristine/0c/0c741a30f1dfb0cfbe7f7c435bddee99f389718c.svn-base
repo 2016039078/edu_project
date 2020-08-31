@@ -1,0 +1,45 @@
+
+package kr.co.ncspartner.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import egovframework.rte.psl.dataaccess.EgovAbstractMapper;
+import kr.co.ncspartner.vo.ConVO;
+import kr.co.ncspartner.vo.SampleVO;
+
+import org.springframework.stereotype.Repository;
+
+@Repository("conDAO")
+public class ConDAO extends EgovAbstractMapper {
+
+	public int insert(ConVO vo) throws Exception {
+		return update("con.insert", vo);
+	}
+
+	public int update(ConVO vo) throws Exception {
+		return update("con.update", vo);
+	}
+
+	public int delete(ConVO vo) throws Exception {
+		return update("con.delete", vo);
+	}
+
+	public ConVO select(ConVO vo) throws Exception {
+		return (ConVO) selectOne("con.select", vo);
+	}
+
+	public List<?> selectList(ConVO vo) throws Exception {
+		return list("con.selectList", vo);
+	}
+
+	public int selectListTotCnt(ConVO vo) {
+		return (Integer) selectOne("con.selectListTotCnt", vo);
+	}
+	
+	public List<Map<String, Object>> selectOneWeekDay() throws Exception {
+		return selectList("con.selectOneWeekDay");
+	}
+
+
+}

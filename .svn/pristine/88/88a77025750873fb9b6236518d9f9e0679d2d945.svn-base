@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="review">
+
+	<update id="insert" parameterType="reviewVO">
+
+		INSERT INTO ROOMS_REVIEW
+		( R_ID
+		, USER_ID
+		, REVIEW_CONTENT
+		, REVIEW_DATE
+		, REVIEW_SCORE )
+		VALUES ( 
+		#{r_id}
+		, #{user_id}
+		, #{review_content}
+		, #{review_date}
+		, #{review_score} )
+
+	</update>
+
+	<update id="update" parameterType="reviewVO">
+
+		<!-- UPDATE REVIEW --><!--DATE_FORMAT(NOW(), '%Y%m%d%h%m%s' -->
+		<!-- SET ID=#{id} -->
+		<!-- , NAME=#{name} -->
+		<!-- , DESCRIPTION=#{description} -->
+		<!-- , USE_YN=#{use_yn} -->
+		<!-- WHERE ID=#{id} -->
+
+	</update>
+
+	<update id="delete" parameterType="reviewVO">
+
+		DELETE FROM ROOMS_REVIEW
+		WHERE
+		R_ID=#{r_id} AND USER_ID=#{user_id}
+
+	</update>
+
+	<select id="select" resultType="reviewVO">
+
+		SELECT
+		*
+		FROM ROOMS_REVIEW
+		WHERE
+		R_ID=#{r_id}
+
+	</select>
+
+	<select id="selectList" parameterType="reviewVO"
+		resultType="reviewVO">
+		SELECT USER.USER_NAME,
+		ROOMS_REVIEW.REVIEW_CONTENT, ROOMS_REVIEW.REVIEW_DATE, ROOMS_REVIEW.REVIEW_SCORE,
+		ROOMS_REVIEW.USER_ID FROM ROOMS_REVIEW JOIN USER ON
+		ROOMS_REVIEW.USER_ID = USER.USER_ID WHERE ROOMS_REVIEW.R_ID=#{r_id}
+	</select>
+
+	<select id="selectListhighscore" parameterType="reviewVO"
+		resultType="reviewVO">
+		SELECT *, AVG(ROOMS_REVIEW.REVIEW_SCORE) AS AAVG
+		FROM
+		ROOMS_REVIEW
+		JOIN ROOMS
+		ON ROOMS.R_ID=ROOMS_REVIEW.R_ID
+		WHERE
+		ROOMS_REVIEW.REVIEW_SCORE
+		GROUP BY ROOMS_REVIEW.R_ID
+		LIMIT 5
+	</select>
+
+	<select id="scoreAvg" resultType="reviewVO">
+		SELECT
+		ROUND(AVG(ROOMS_REVIEW.REVIEW_SCORE),2) AS avg
+		,COUNT(ROOMS_REVIEW.REVIEW_CONTENT) AS review_count
+		FROM ROOMS_REVIEW
+		WHERE R_ID=#{r_id}
+	</select>
+
+	<select id="selectListTotCnt" parameterType="reviewVO"
+		resultType="int">
+		SELECT COUNT(*) totcnt
+		FROM ROOMS_REVIEW
+		WHERE 1=1
+		<if test="searchKeyword != null and searchKeyword != ''">
+			<choose>
+				<when test="searchCondition == 0">
+					AND ID LIKE '%' || #{searchKeyword} || '%'
+				</when>
+				<when test="searchCondition == 1">
+					AND NAME LIKE '%' || #{searchKeyword} || '%'
+				</when>
+			</choose>
+		</if>
+	</select>
+
+</mapper>

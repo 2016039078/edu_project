@@ -1,0 +1,203 @@
+
+package kr.co.ncspartner.web;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springmodules.validation.commons.DefaultBeanValidator;
+
+import egovframework.rte.fdl.property.EgovPropertyService;
+import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
+import kr.co.ncspartner.service.JeogiService;
+import kr.co.ncspartner.service.ReviewService;
+import kr.co.ncspartner.vo.JeogiVO;
+import kr.co.ncspartner.vo.Jeogi_userVO;
+import kr.co.ncspartner.vo.ReviewVO;
+import kr.co.ncspartner.vo.SampleVO;
+
+
+
+@Controller
+public class JeogiController {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(JeogiController.class);
+
+	@Resource(name = "jeogiService")
+	private JeogiService jeogiService;
+	
+	@Resource(name = "reviewService")
+	private ReviewService reviewService;
+
+	@Resource(name = "propertiesService")
+	protected EgovPropertyService propertiesService;
+
+	@Resource(name = "beanValidator")
+	protected DefaultBeanValidator beanValidator;
+	
+	
+	@RequestMapping(value = "/rooms_search01.do")
+	public String do_sample_select(@ModelAttribute("jeogiVO") JeogiVO vo , ModelMap model) throws Exception {
+		
+		LOGGER.debug("--------------------------------//sample_select.do");
+		LOGGER.debug(vo.toString());
+
+		vo.setPageUnit(propertiesService.getInt("pageUnit"));
+		vo.setPageSize(propertiesService.getInt("pageSize"));
+
+		PaginationInfo paginationInfo = new PaginationInfo();
+		paginationInfo.setCurrentPageNo(vo.getPageIndex());
+		paginationInfo.setRecordCountPerPage(vo.getPageUnit());
+		paginationInfo.setPageSize(vo.getPageSize());
+
+		vo.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		vo.setLastIndex(paginationInfo.getLastRecordIndex());
+		vo.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+
+		List<?> list = jeogiService.selectList(vo);
+		model.addAttribute("list", list);
+		
+	
+		int totCnt = jeogiService.selectListTotCnt(vo);
+		paginationInfo.setTotalRecordCount(totCnt);
+		model.addAttribute("paginationInfo", paginationInfo);
+
+		return "sample/rooms_search01";
+	}	
+	
+	@RequestMapping(value = "/rooms_search02.do")
+	public String do_rooms_search02(@ModelAttribute("jeogiVO") JeogiVO vo,@ModelAttribute("reviewVO") ReviewVO vo2, ModelMap model) throws Exception {
+		
+		LOGGER.debug("--------------------------------//rooms_search02.do");
+		LOGGER.debug(vo.toString());
+
+		vo.setPageUnit(propertiesService.getInt("pageUnit"));
+		vo.setPageSize(propertiesService.getInt("pageSize"));
+
+		PaginationInfo paginationInfo = new PaginationInfo();
+		paginationInfo.setCurrentPageNo(vo.getPageIndex());
+		paginationInfo.setRecordCountPerPage(vo.getPageUnit());
+		paginationInfo.setPageSize(vo.getPageSize());
+
+		vo.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		vo.setLastIndex(paginationInfo.getLastRecordIndex());
+		vo.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+
+		List<?> bestroomslist = jeogiService.selectListbestrooms(vo);
+		model.addAttribute("bestroomslist", bestroomslist);
+
+		
+		List<?> reviewlist = reviewService.selectListhighscore(vo2);
+		model.addAttribute("reviewlist", reviewlist);
+		
+		List<?> recentlylist = jeogiService.selectListRecentlyUpdate(vo);
+		model.addAttribute("recentlylist", recentlylist);
+		
+		int totCnt = jeogiService.selectListTotCnt(vo);
+		paginationInfo.setTotalRecordCount(totCnt);
+		model.addAttribute("paginationInfo", paginationInfo);
+
+		return "sample/rooms_search02";
+	}	
+	
+	
+	@RequestMapping(value = "/jeogi_hosting_select.do")
+	public String do_jeogi_hosting_select(@ModelAttribute("jeogiVO") JeogiVO vo , ModelMap model,HttpSession session) throws Exception {
+		
+		LOGGER.debug("--------------------------------//jeogi_hosting_select.do");
+		LOGGER.debug(vo.toString());
+
+		vo.setPageUnit(propertiesService.getInt("pageUnit"));
+		vo.setPageSize(propertiesService.getInt("pageSize"));
+
+		PaginationInfo paginationInfo = new PaginationInfo();
+		paginationInfo.setCurrentPageNo(vo.getPageIndex());
+		paginationInfo.setRecordCountPerPage(vo.getPageUnit());
+		paginationInfo.setPageSize(vo.getPageSize());
+
+		vo.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		vo.setLastIndex(paginationInfo.getLastRecordIndex());
+		vo.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+		Jeogi_userVO uvo = (Jeogi_userVO) session.getAttribute("userSession");
+		vo.setUser_id(uvo.getUser_id());
+		
+		List<?> hostinglist = jeogiService.selectListHosting(vo);
+		model.addAttribute("hostinglist", hostinglist);
+		
+	
+		int totCnt = jeogiService.selectListTotCnt(vo);
+		paginationInfo.setTotalRecordCount(totCnt);
+		model.addAttribute("paginationInfo", paginationInfo);
+
+		return "jeogi/jeogi_hosting_select";
+	}	
+	
+	
+//	@RequestMapping(value = "/rooms_detail.do")
+//	public String do_sample_detail(@ModelAttribute("jeogiVO") JeogiVO vo, ModelMap model) throws Exception {
+//		LOGGER.debug("--------------------------------//sample_detail.do");
+//		LOGGER.debug(vo.toString());		
+//		JeogiVO rvo = jeogiService.select(vo);
+//		JeogiVO rvo2 = jeogiService.select2(vo);
+//		model.addAttribute("rvo", rvo);
+//		model.addAttribute("rvo2", rvo2);
+//		return "sample/rooms_detail";
+//	}
+//	
+//	@ResponseBody
+//	@RequestMapping(value = "/ajaxTest.do", method=RequestMethod.POST)
+//	public Map<String, Object> ajaxTest(@RequestParam Map<String, Object> paramMap, HttpServletResponse response) throws Exception {
+//		LOGGER.debug("--------------------------//ajaxTest.do");
+//		
+//		Map<String, Object> result = new HashMap<String, Object>();
+//		
+//		System.out.println("■■■■■■■■■■■■■■■■■■■paramMap >> " + paramMap.toString());
+//		System.out.println("■■■■■■■■■■■■■■■■■■■아작스!!!!!!!!!!!!!!");
+//		
+//		JeogiVO pVo = new JeogiVO();
+//		
+//		List<?> sampleList = jeogiService.selectsearchList(pVo);
+//		
+////		List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
+////		Map<String, Object> map = new HashMap<String, Object>();
+////		map.put("ID", "sojung");
+////		map.put("NAME", "김소정");
+////		listMap.add(map);
+////		map = new HashMap<String, Object>();
+////		
+////		map.put("ID", "tk");
+////		map.put("NAME", "태경");
+////		listMap.add(map);
+////		map = new HashMap<String, Object>();
+////		
+////		map.put("ID", "somin");
+////		map.put("NAME", "김소민");
+////		listMap.add(map);
+////		
+////		
+////		result.put("SUCCESS", "Y");
+//		result.put("sampleList", sampleList);
+//		
+//		
+//		
+//		return result;
+//		
+//	}
+//	
+	
+
+	
+}

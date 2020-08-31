@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="precautions">
+
+	<update id="insert" parameterType="precautionsVO" >
+
+			INSERT INTO PRECAUTIONS
+			( 
+				  r_id 
+				, noti_title01
+				, noti_title02
+				, noti_title03
+				, noti_title04
+				, noti_title05
+			 )
+
+				SELECT CONCAT('r', (SELECT LPAD(COUNT(*)+1,3,'0') FROM PRECAUTIONS))
+			  , #{noti_title01}
+			  , #{noti_title02}
+			  , #{noti_title03}
+			  , #{noti_title04} 
+			  , #{noti_title05} 
+	</update>
+
+	<update id="update"  parameterType="precautionsVO" >
+
+			UPDATE PRECAUTIONS
+			SET 
+				ID=#{id}
+				, NAME=#{name}
+				, DESCRIPTION=#{description}
+				, USE_YN=#{use_yn}
+			WHERE ID=#{id}
+
+	</update>
+
+	<update id="delete"  parameterType="precautionsVO">
+
+			DELETE FROM PRECAUTIONS
+			WHERE ID=#{id}
+
+	</update>
+
+	<select id="select" resultType="precautionsVO">
+			SELECT
+			*
+			FROM PRECAUTIONS
+			WHERE R_ID=#{r_id}
+
+	</select>
+
+	<select id="selectList" parameterType="precautionsVO" resultType="precautionsVO">
+
+			SELECT
+				R_ID ,NOTI_TITLE01, NOTI_TITLE02, NOTI_TITLE03, NOTI_TITLE04, NOTI_TITLE05
+			FROM PRECAUTIONS
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+		        <choose>
+		            <when test="searchCondition == 0">
+						AND	ID LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 1">
+						AND	NAME LIKE '%' || #{searchKeyword} || '%'
+					</when>
+				</choose>
+			</if>
+			ORDER BY R_ID DESC
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectListTotCnt" parameterType="precautionsVO" resultType="int">
+
+			SELECT COUNT(*) totcnt
+			FROM PRECAUTIONS
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+		        <choose>
+		            <when test="searchCondition == 0">
+						AND ID LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 1">
+						AND	NAME LIKE '%' || #{searchKeyword} || '%'
+					</when>
+				</choose>
+			</if>
+	</select>
+
+</mapper>

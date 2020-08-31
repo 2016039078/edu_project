@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="roomsReservation">
+
+	<update id="insert" parameterType="roomsReservationVO" >
+
+	INSERT INTO ROOMS_RESERVATION 
+		(
+				r_id, r_date , user_id
+
+		) 
+		values
+		(
+				#{r_id}
+				,#{r_date}
+				,#{user_id}
+		)
+		
+
+	</update>
+	
+	
+	<select id="getR_id" resultType="String">
+		select  ifnull(max(r_id),'r000')  from rooms_reservation
+	</select> 
+	
+	
+
+	<update id="update"  parameterType="roomsReservationVO" >
+
+			UPDATE ROOMS_RESERVATION
+			SET USER_ID =#{user_id}
+			  , RESERVATION_YN = 'Y'
+			WHERE R_ID =#{r_id} AND R_DATE =#{r_date}
+
+	</update>
+	
+		<update id="hostupdate"  parameterType="roomsReservationVO" >
+
+			UPDATE ROOMS_RESERVATION
+			SET	R_DATE =#{r_date}
+			WHERE R_ID =#{r_id} AND R_DATE =#{r_date}
+
+	</update>
+	
+
+	<update id="delete"  parameterType="roomsReservationVO">
+
+			DELETE FROM ROOMS_RESERVATION
+			WHERE R_ID=#{r_id}
+
+	</update>
+	
+		<update id="lastdatedelete"  parameterType="roomsReservationVO">
+
+			DELETE FROM ROOMS_RESERVATION
+
+			where R_DATE <![CDATA[ < ]]> CURDATE() ORDER BY R_DATE DESC
+
+	</update>
+
+	<select id="select" resultType="roomsReservationVO">
+
+			UPDATE ROOMS_RESERVATION
+			SET USER_ID =#{user_id}
+			  , RESERVATION_YN = 'Y'
+			WHERE R_ID =#{r_id} AND R_DATE =#{r_date}
+
+
+	</select> 
+	
+	<select id="reservedselect" resultType="roomsReservationVO">
+
+		SELECT ROOMS.R_TITLE, ROOMS.R_ATTACH01, ROOMS.R_PATH01, ROOMS_RESERVATION.R_DATE
+		FROM ROOMS_RESERVATION
+		JOIN ROOMS
+		ON ROOMS_RESERVATION.R_ID = ROOMS.R_ID
+		WHERE ROOMS_RESERVATION.USER_ID =#{user_id} 
+		AND ROOMS_RESERVATION.RESERVATION_YN ='Y' 
+		AND ROOMS_RESERVATION.R_DATE  <![CDATA[ >= ]]> CURDATE() ORDER BY R_DATE DESC
+
+	</select> 
+
+
+	<select id="lastreservedselect" resultType="roomsReservationVO">
+
+		SELECT ROOMS.R_TITLE, ROOMS.R_ATTACH01, ROOMS.R_PATH01, ROOMS_RESERVATION.R_DATE
+		FROM ROOMS_RESERVATION
+		JOIN ROOMS
+		ON ROOMS_RESERVATION.R_ID = ROOMS.R_ID
+		WHERE ROOMS_RESERVATION.USER_ID =#{user_id} 
+		AND ROOMS_RESERVATION.RESERVATION_YN ='Y' 
+		AND ROOMS_RESERVATION.R_DATE <![CDATA[ < ]]> CURDATE() ORDER BY R_DATE DESC
+
+	</select> 
+	
+	
+	<select id="selectList" parameterType="roomsReservationVO" resultType="roomsReservationVO">
+
+			SELECT
+				R_ID, USER_ID, R_DATE, RESERVATION_YN
+			FROM 
+				ROOMS_RESERVATION
+			WHERE 
+				R_ID =#{r_id}
+	</select>
+
+<!-- 	<select id="selectListTotCnt" parameterType="roomsReservationVO" resultType="int"> -->
+
+<!-- 			SELECT COUNT(*) totcnt -->
+<!-- 			FROM ROOMS_RESERVATION -->
+<!-- 			WHERE 1=1 -->
+<!-- 			<if test="searchKeyword != null and searchKeyword != ''"> -->
+<!-- 		        <choose> -->
+<!-- 		            <when test="searchCondition == 0"> -->
+<!-- 						AND ID LIKE '%' || #{searchKeyword} || '%' -->
+<!-- 					</when> -->
+<!-- 		            <when test="searchCondition == 1"> -->
+<!-- 						AND	NAME LIKE '%' || #{searchKeyword} || '%' -->
+<!-- 					</when> -->
+<!-- 				</choose> -->
+<!-- 			</if> -->
+<!-- 	</select> -->
+		<select id="selectUpdateRoomreservation" resultType="java.util.HashMap">
+		SELECT TA.ONE_WEEK
+		FROM
+		(
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 0 ) AS ONE_WEEK, '월요일' AS DAY
+			UNION ALL
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 1 ), '화요일' AS DAY
+			UNION ALL
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 2 ), '수요일' AS DAY
+			UNION ALL
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 3 ), '목요일' AS DAY
+			UNION ALL
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 4 ), '금요일' AS DAY
+			UNION ALL
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 5 ), '토요일' AS DAY
+			UNION ALL
+			SELECT ADDDATE( CURDATE(), - WEEKDAY(CURDATE()) + 6 ), '일요일' AS DAY
+		) TA
+		
+		JOIN rooms_reservation
+		ON rooms_reservation.r_date = TA.ONE_WEEK
+		WHERE TA.ONE_WEEK >= CURDATE() AND ROOMS_RESERVATION.R_ID =#{r_id}
+	</select>
+	
+		<select id="selectCountReserved" parameterType="roomsReservationVO" resultType="roomsReservationVO">
+			SELECT
+				COUNT(*) as resercedcnt
+			FROM 
+				ROOMS_RESERVATION
+			WHERE ROOMS_RESERVATION.R_DATE =#{r_date} AND rooms_reservation.r_id = #{r_id}
+		</select>
+	
+	
+</mapper>

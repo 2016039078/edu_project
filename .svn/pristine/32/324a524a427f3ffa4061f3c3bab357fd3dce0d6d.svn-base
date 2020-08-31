@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="roomsReservation">
+
+	<update id="insert" parameterType="roomsReservationVO" >
+
+	INSERT INTO ROOMS_RESERVATION 
+		(
+				r_id, r_date 
+
+		) 
+		values
+		(
+				#{r_id}
+				,#{r_date}
+		)
+		
+
+	</update>
+	
+	
+	<select id="getR_id" resultType="String">
+		SELECT CONCAT('r', (SELECT LPAD(COUNT(*)+1,3,'0') FROM ROOMS_RESERVATION )) as r_id
+	</select> 
+	
+	
+
+	<update id="update"  parameterType="roomsReservationVO" >
+
+<!-- 			UPDATE ROOMS_RESERVATION -->
+<!-- 			SET  -->
+<!-- 				ID=#{r_id} -->
+<!-- 				, NAME=#{name} -->
+<!-- 				, DESCRIPTION=#{description} -->
+<!-- 				, USE_YN=#{use_yn} -->
+<!-- 			WHERE ID=#{r_id} -->
+
+	</update>
+
+	<update id="delete"  parameterType="roomsReservationVO">
+
+<!-- 			DELETE FROM ROOMS_RESERVATION -->
+<!-- 			WHERE ID=#{r_id} -->
+
+	</update>
+
+<!-- 	<select id="select" resultType="roomsReservationVO"> -->
+
+<!-- 			SELECT -->
+<!-- 			reservation_id, r_date -->
+<!-- 			FROM rooms_reservation -->
+<!-- 			WHERE R_ID=#{r_id} -->
+
+<!-- 	</select>  -->
+
+	<select id="selectList" parameterType="roomsReservationVO" resultType="roomsReservationVO">
+
+			SELECT
+				R_ID, USER_ID, R_DATE, RESERVATION_YN
+			FROM 
+				ROOMS_RESERVATION
+			WHERE 
+				R_ID =#{r_id}
+	</select>
+
+<!-- 	<select id="selectListTotCnt" parameterType="roomsReservationVO" resultType="int"> -->
+
+<!-- 			SELECT COUNT(*) totcnt -->
+<!-- 			FROM ROOMS_RESERVATION -->
+<!-- 			WHERE 1=1 -->
+<!-- 			<if test="searchKeyword != null and searchKeyword != ''"> -->
+<!-- 		        <choose> -->
+<!-- 		            <when test="searchCondition == 0"> -->
+<!-- 						AND ID LIKE '%' || #{searchKeyword} || '%' -->
+<!-- 					</when> -->
+<!-- 		            <when test="searchCondition == 1"> -->
+<!-- 						AND	NAME LIKE '%' || #{searchKeyword} || '%' -->
+<!-- 					</when> -->
+<!-- 				</choose> -->
+<!-- 			</if> -->
+<!-- 	</select> -->
+
+</mapper>

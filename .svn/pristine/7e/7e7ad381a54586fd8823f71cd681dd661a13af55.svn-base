@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="messenger">
+	
+
+
+	<update id="insert" parameterType="messengerVO" >
+		INSERT INTO messenger 
+			(R_ID,
+			MS_ID,
+			MS_SEQ,
+			USER_ID,
+			MS_MESSAGE,
+			M_DATETIME) 
+		VALUES 
+			(#{r_id},
+			#{ms_id},
+			'1',
+			#{user_id},
+			#{ms_message},
+			DATE_FORMAT(NOW(), '%Y%m%d%h%m%s'))
+			
+<!-- 		WHERE -->
+<!-- 			R_ID = #{r_id} and USER_ID = #{user_id} -->
+			
+
+	</update>
+
+
+
+	<select id="selectList" parameterType="messengerVO" resultType="messengerVO">
+
+		SELECT
+				MS_ID,
+				R.R_ID,
+				M.USER_ID,
+				R_TITLE,
+				MS_SEQ,
+				MS_MESSAGE,
+				M_DATETIME
+				
+			FROM USER U, MESSENGER M, ROOMS R
+			WHERE U.USER_ID = M.USER_ID AND
+			M.R_ID = R.R_ID AND
+			M.USER_ID = #{user_id}
+
+	</select>
+
+	<select id="selectListTotCnt" parameterType="messengerVO" resultType="int">
+
+			SELECT COUNT(*) totcnt
+			FROM MESSENGER
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+		        <choose>
+		            <when test="searchCondition == 0">
+						AND ID LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 1">
+						AND	NAME LIKE '%' || #{searchKeyword} || '%'
+					</when>
+				</choose>
+			</if>
+	</select>
+	
+	<select id="getMs_id" parameterType="messengerVO" resultType="string">
+
+		SELECT
+			ifnull(max(MS_ID),'1') MS_ID
+		FROM MESSENGER
+		where
+			r_id = #{r_id}
+
+	</select>
+	
+	
+	<select id="getChatRooms" parameterType="messengerVO" resultType="messengerVO">
+
+		select 
+				r_id,
+				ms_id
+		from
+		(
+			SELECT
+				r_id,
+				(select user_id from rooms where r_id=m.r_id) host_id,
+				ms_id,
+				ms_seq,
+				user_id,
+				ms_message,
+				m_datetime
+			FROM MESSENGER m 
+		) a
+		
+		where
+			host_id = #{user_id} or user_id = #{user_id}
+		group by r_id, ms_id	
+
+	</select>
+	
+	
+	
+	<select id="getChats" parameterType="messengerVO" resultType="messengerVO">
+
+		select 
+				r_id,
+				host_id,
+				ms_id,
+				ms_seq,
+				user_id,
+				ms_message,
+				m_datetime
+		from
+		(
+			SELECT
+				r_id,
+				(select user_id from rooms where r_id=m.r_id) host_id,
+				ms_id,
+				ms_seq,
+				user_id,
+				ms_message,
+				m_datetime
+			FROM MESSENGER m 
+		) a
+		
+		where
+			r_id = #{r_id} and ms_id = #{ms_id}
+	
+
+
+	</select>
+		
+
+</mapper>

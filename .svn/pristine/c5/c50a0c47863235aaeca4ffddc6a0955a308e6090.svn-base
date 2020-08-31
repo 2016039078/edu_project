@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jeogi_faq">
+
+<update id="insert" parameterType="jeogi_faqVO" >
+
+			INSERT INTO FAQ
+			( 
+
+				FAQ_SEQ,
+				QUESTION,
+				ANSWER,
+				R_DATE
+			)
+				
+			VALUES 	
+			( 
+
+				#{faq_seq},
+				#{question},
+				#{answer},
+				#{r_date}
+				
+			)
+	
+	
+)	
+		
+
+	</update>
+
+	<update id="update"  parameterType="jeogi_faqVO" >
+
+			UPDATE FAQ
+			SET 
+				FAQ_SEQ=#{faq_seq},
+				QUESTION=#{question},
+				ANSWET=#{answet},
+				R_DAT=#{r_dat},
+				
+			WHERE FAQ_SEQ==#{faq_seq}
+
+	</update>
+	
+	
+
+	<update id="delete"  parameterType="jeogi_faqVO">
+
+			DELETE FROM FAQ
+			WHERE FAQ_SEQ==#{faq_seq}
+
+	</update>
+
+	<select id="select" resultType="jeogi_faqVO">
+
+			SELECT
+				FAQ_SEQ,
+				QUESTION,
+				ANSWET,
+				R_DAT
+			FROM FAQ
+			WHERE FAQ_SEQ==#{faq_seq}
+	</select>
+	
+	<select id="selectList" parameterType="jeogi_faqVO" resultType="jeogi_faqVO">
+
+			SELECT
+				FAQ_SEQ,
+				QUESTION,
+				ANSWET,
+				R_DAT
+			FROM FAQ
+
+			ORDER BY FAQ_SEQ DESC
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+			
+	<select id="selectListTotCnt" parameterType="jeogi_faqVO" resultType="int">
+
+			SELECT COUNT(*) totcnt
+			FROM FAQ
+			WHERE 1=1
+
+	</select>
+</mapper>

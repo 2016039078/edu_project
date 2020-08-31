@@ -1,0 +1,95 @@
+
+package kr.co.ncspartner.web;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+
+import org.hsqldb.rights.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springmodules.validation.commons.DefaultBeanValidator;
+
+import egovframework.rte.fdl.property.EgovPropertyService;
+import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
+import kr.co.ncspartner.service.LikelistService;
+import kr.co.ncspartner.vo.Jeogi_userVO;
+import kr.co.ncspartner.vo.LikelistVO;
+
+
+
+
+@Controller
+public class LikelistController {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(LikelistController.class);
+
+	@Resource(name = "LikelistService")
+	private LikelistService likelistService;
+
+	@Resource(name = "propertiesService")
+	protected EgovPropertyService propertiesService;
+
+	@Resource(name = "beanValidator")
+	protected DefaultBeanValidator beanValidator;
+	
+	
+	@RequestMapping("likelist_insert.do")
+	public String do_likelist_insert(@ModelAttribute("likelistVO") LikelistVO vo, HttpSession session) throws Exception {
+		LOGGER.debug("--------------------------------//likelist_insert.do");
+		LOGGER.debug(vo.toString());	
+		
+		String user_id = toString();
+		
+		Jeogi_userVO sessionVo = (Jeogi_userVO) session.getAttribute("userSession");
+		user_id = sessionVo.getUser_id();
+		vo.setUser_id(user_id);
+		
+		likelistService.insert(vo);
+		
+		return "redirect:/likelist_select.do";
+	}		
+//	@RequestMapping(value = "/jeogi_user_insert_act.do")
+//	public String do_jeogi_user_insert_act(@ModelAttribute("likelistVO") LikelistVO vo, ModelMap model) throws Exception {
+//		LOGGER.debug("--------------------------------//jeogi_user_insert_act.do");
+//		LOGGER.debug(vo.toString());		
+//		int cnt = likelistService.insert(vo);
+//		model.addAttribute("cnt", cnt);
+//		return "jeogi_act/jeogi_user_insert_act";
+//	}	
+	
+	@RequestMapping("likelist_select.do")
+	public String likelist_select(@ModelAttribute("likelistVO") LikelistVO vo, HttpSession session, ModelMap model) throws Exception {
+		
+		LOGGER.debug("--------------------------------//likelist_select.do");
+		LOGGER.debug(session.toString());
+
+		String user_id = toString();
+		
+		Jeogi_userVO sessionVo = (Jeogi_userVO) session.getAttribute("userSession");
+		user_id = sessionVo.getUser_id();
+		vo.setUser_id(user_id);
+		
+		List<?> list = likelistService.selectList(vo);
+		
+		
+		model.addAttribute("list", list);
+		return "jeogi/likelist_select";
+	}	
+	
+	@RequestMapping("likelist_delete.do")
+	public String do_likelist_delete(@ModelAttribute("likelistVO") LikelistVO vo, HttpSession session) throws Exception {
+		likelistService.delete(vo);
+		return "redirect:/likelist_select.do";
+	}
+
+}

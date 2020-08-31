@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jeogi_user">
+
+
+	<select id="select" resultType="jeogi_userVO">
+<!-- 	 소민 -->
+
+			SELECT
+				*
+			FROM USER
+			WHERE USER_ID=#{user_id}
+	</select>
+	
+	
+	<select id="selectHost" resultType="jeogi_userVO" parameterType="jeogi_userVO">
+
+		SELECT USER_NAME, HOST_INTRO
+		FROM ROOMS
+		JOIN USER
+		ON ROOMS.USER_ID = USER.USER_ID
+		WHERE ROOMS.R_ID = #{r_id};
+
+	</select>
+	
+
+	<select id="selectList" parameterType="jeogi_userVO" resultType="jeogi_userVO">
+
+			SELECT
+				*
+			FROM USER
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+		        <choose>
+		            <when test="searchCondition == 0">
+						AND	ID LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 1">
+						AND	NAME LIKE '%' || #{searchKeyword} || '%'
+					</when>
+				</choose>
+			</if>
+			ORDER BY USER_ID DESC
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectListTotCnt" parameterType="jeogi_userVO" resultType="int">
+
+			SELECT COUNT(*) totcnt
+			FROM USER
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+		        <choose>
+		            <when test="searchCondition == 0">
+						AND ID LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 1">
+						AND	NAME LIKE '%' || #{searchKeyword} || '%'
+					</when>
+				</choose>
+			</if>
+	</select>
+	
+		<select id="selectLogin" resultType="jeogi_userVO">
+
+			SELECT
+				*
+			FROM USER
+			WHERE 
+				1			=	1 AND
+				EMAIL		=	#{email} AND
+				PASSWORD	=	#{password}
+
+
+	</select>
+	
+		<update id="insert" parameterType="jeogi_userVO" >
+
+			
+			INSERT INTO USER
+			( 
+				USER_ID
+			  , EMAIL
+			  , PASSWORD
+			  , USER_NAME
+			  , USER_BIRTH
+			  , USER_PH 
+			  , TAG
+			  , HOST_INTRO 
+			 )
+			 
+			SELECT CONCAT('m', (SELECT LPAD(COUNT(*)+1,3,'0') FROM USER ))
+				, #{email}				
+				, #{password}
+				, #{user_name}
+				, #{user_birth}
+				, #{user_ph}
+				, #{tag}
+				, #{host_intro}			  			  
+
+	</update>	
+
+	<update id="update"  parameterType="jeogi_userVO" >
+
+			UPDATE USER
+			SET 
+				USER_NAME=#{user_name}
+				, EMAIL=#{email}
+				, PASSWORD=#{password}
+				, USER_BIRTH=#{user_birth}
+				, USER_PH=#{user_ph}
+				, HOST_INTRO=#{host_intro}
+			WHERE USER_ID=#{user_id}
+
+	</update>
+	
+	
+		<update id="updateHostIntro"  parameterType="jeogi_userVO" >
+			UPDATE USER 
+			SET HOST_INTRO =#{host_intro}
+			WHERE USER_ID =#{user_id}
+
+	</update>
+
+</mapper>

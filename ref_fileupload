@@ -1,0 +1,90 @@
+@RequestMapping(value = "/menu_add.act")
+public String act_menu_add(@ModelAttribute("f_truck_menuVO") F_truck_menuVO paramVO, HttpServletRequest request, ModelMap model, HttpServletResponse response) throws Exception {
+	String url = "/menu_add.act";
+	LOGGER.debug("-----------------------:url:"+url);
+	LOGGER.info("------------------------------------------------------------:paramVO:" + paramVO);
+	LOGGER.debug("-----------------------:menuVO:"+paramVO.getMyfile().getOriginalFilename());
+	
+	CommonsMultipartFile multipartfile = (CommonsMultipartFile) paramVO.getMyfile();
+
+	String file_origin = multipartfile.getOriginalFilename();
+	String file_path = "D:/upload/foodtruck_web/menu/" + multipartfile.getOriginalFilename()+new Date().getTime();
+	File file = new File(file_path);
+	multipartfile.transferTo(file);	
+	
+	if(file_origin != null){
+		if(file_origin.length() > 0){
+			paramVO.setFile_origin(file_origin);
+			paramVO.setFile_path(file_path);
+		}
+	}
+	int count = 0;
+	try {
+		count = f_truck_menuService.insertAuto(paramVO);
+	} catch (Exception e) {
+		LOGGER.debug("-----------------------:error..:"+e);
+	}
+
+	model.addAttribute("count", count);
+	
+	return "menu_add_act";
+}
+	
+	
+	
+	
+
+<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+</bean>
+
+
+private MultipartFile myfile;
+
+
+	@RequestMapping(value = "/animals_board_mod.act")
+	public String act_animals_board_mod(@ModelAttribute("a_boardVO") A_boardVO paramVO) throws Exception {
+		String auth_url = "/animals_board_mod.act";
+		LOGGER.info("------------------------------------------------------------:" + auth_url);
+		LOGGER.info("------------------------------------------------------------:paramVO:" + paramVO);
+		LOGGER.debug("-----------------------:noticeVO:" + paramVO.getMyfile().getOriginalFilename());
+
+		A_boardVO oldVO = a_boardService.select(paramVO);
+
+		if (!paramVO.getMyfile().getOriginalFilename().equals("")) {
+			CommonsMultipartFile multipartfile = (CommonsMultipartFile) paramVO.getMyfile();
+
+			String file_origin = multipartfile.getOriginalFilename();
+			String file_path = "D:/upload/" + multipartfile.getOriginalFilename() + new Date().getTime();
+			File file = new File(file_path);
+			multipartfile.transferTo(file);
+
+			paramVO.setFile_origin(file_origin);
+			paramVO.setFile_path(file_path);
+		} else {
+			paramVO.setFile_origin(oldVO.getFile_origin());
+			paramVO.setFile_path(oldVO.getFile_path());
+		}
+
+		int appliedNum = a_boardService.update(paramVO);
+		LOGGER.info("------------------------------------------------------------:appliedNum:" + appliedNum);
+		return "redirect:/animals_board_list.do";
+	}
+
+
+	@RequestMapping(value = "/animals_board_delete_file.ajax")
+	public void ajax_animals_board_delete_file(@ModelAttribute("a_boardVO") A_boardVO paramVO,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String auth_url = "/animals_board_delete_file.ajax";
+		LOGGER.debug("------------------------------------------------------------:" + auth_url);
+		LOGGER.debug("------------------------------------------------------------:paramVO:" + paramVO);
+
+		int count = a_boardService.deleteFile(paramVO);
+		LOGGER.debug("-----------------------:count:" + count);
+		String message = "ok";
+		if (count != 1) {
+			message = "ng";
+		}
+
+		AjaxUtil.responseJson(response, message);
+	}
+

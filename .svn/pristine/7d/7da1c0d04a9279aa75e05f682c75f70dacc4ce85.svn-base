@@ -1,0 +1,56 @@
+	@RequestMapping(value = "/b_location_hp_view.do")
+	public String do_b_location_hp_view(@ModelAttribute("b_location_hpVO") B_location_hpVO paramVO, HttpServletRequest request, Model model) throws Exception {
+		String auth_url = "/b_location_hp_view.do";
+		LOGGER.info("------------------------------------------------------------:" + auth_url);
+		LOGGER.info("------------------------------------------------------------:paramVO:" + paramVO);
+		M_userVO m_uservo = (M_userVO) request.getSession().getAttribute("userSession");
+		if (m_uservo == null) {
+			return "redirect:/auth_login.do";
+		}
+		M_user_authVO authVO = findAuth(auth_url, m_uservo.getUser_id());
+		if (authVO.getAuth_flag().equals("N") && authVO.getCommon_flag().equals("N")) {
+			return "redirect:/auth_error.do";
+		}
+		writeLog(auth_url,m_uservo.getUser_id(),request);
+		
+		M_user_authVO authVO_edit	= findAuth("/b_location_hp_edit.do"		, m_uservo.getUser_id());
+		M_user_authVO authVO_del	= findAuth("/b_location_hp_del.act"		, m_uservo.getUser_id());
+
+		String flag_edit		= "n";
+		String flag_del			= "n";
+
+		if (authVO_edit.getAuth_flag().equals("Y")	|| authVO_edit.getCommon_flag().equals("Y"))		flag_edit = "y";
+		if (authVO_del.getAuth_flag().equals("Y")	|| authVO_del.getCommon_flag().equals("Y"))			flag_del = "y";
+		
+		model.addAttribute("flag_edit"		, flag_edit);
+		model.addAttribute("flag_del"		, flag_del);	
+
+		B_location_hpVO modelVO = b_location_hpService.select(paramVO);
+		model.addAttribute("modelVO", modelVO);
+		return "u/b_location_hp_view";
+	}
+	
+	
+	@RequestMapping(value = "/login.act")
+	public String act_login(HttpServletRequest request) throws Exception {
+		String auth_url = "/login.act";
+		LOGGER.info("------------------------------------------------------------:" + auth_url);
+		
+		M_userVO paramVO = new M_userVO();
+		//paramVO.setUser_id("100000");
+		paramVO.setUser_id(request.getParameter("user_id"));
+		//paramVO.setUser_id("800058");
+		M_userVO m_userVO = m_userService.select(paramVO);
+		request.getSession().setAttribute("userSession", m_userVO);
+
+		return "redirect:/login.do";
+	}
+	@RequestMapping(value = "/logout.act")
+	public String act_logout(HttpServletRequest request) throws Exception {
+		String auth_url = "/logout.act";
+		LOGGER.info("------------------------------------------------------------:" + auth_url);
+		request.getSession().removeAttribute("userSession");
+		return "redirect:/main.do";
+	}
+	
+	

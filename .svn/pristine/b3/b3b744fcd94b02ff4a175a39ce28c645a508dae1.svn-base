@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <typeAliases>
+		<typeAlias alias="egovMap" 	type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+		<typeAlias alias="sampleVO" type="kr.co.ncspartner.vo.SampleVO"/>
+		<typeAlias alias="b_gesiVO" type="kr.co.ncspartner.vo.B_gesiVO"/>
+		<typeAlias alias="jeogiVO" type="kr.co.ncspartner.vo.JeogiVO"/>
+		<typeAlias alias="conVO" type="kr.co.ncspartner.vo.ConVO"/>
+		<typeAlias alias="jeogi_userVO" type="kr.co.ncspartner.vo.Jeogi_userVO"/>
+		<typeAlias alias="likelistVO" type="kr.co.ncspartner.vo.LikelistVO"/>
+		
+		
+		<typeAlias alias="precautionsVO" type="kr.co.ncspartner.vo.PrecautionsVO"/>
+		<typeAlias alias="reviewVO" type="kr.co.ncspartner.vo.ReviewVO"/>
+		<typeAlias alias="roomsReservationVO" type="kr.co.ncspartner.vo.RoomsReservationVO"/>
+		<typeAlias alias="jeogi_faqVO" type="kr.co.ncspartner.vo.Jeogi_faqVO"/>
+		<typeAlias alias="jeogi_suggestionsVO" type="kr.co.ncspartner.vo.Jeogi_suggestionsVO"/>
+    </typeAliases>
+</configuration>
